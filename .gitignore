@@ -1,0 +1,23 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Environment files with sensitive data
+backend/env.yaml
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+*.zip
+frontend/chroma-extension-dist.zip
+
+# OS files
+Thumbs.db
+*.swp
+*.swo
+*~
+
