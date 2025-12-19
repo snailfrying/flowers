@@ -522,7 +522,9 @@ export class CoreAgent {
     })();
 
     if (!model || model.trim() === '') {
-      throw new Error('Chat model is not configured. Please set it in settings or env.yaml');
+      // Note: In the browser extension runtime, env.yaml is not used.
+      // Users should configure the chat model via the Settings → Model page.
+      throw new Error('Chat model is not configured. Please open Settings → Model and configure a Chat Model for the selected provider.');
     }
 
     let trace: MCPTrace | undefined;
