@@ -41,24 +41,43 @@
 ## 📸 界面预览
 
 ### 🌐 智能翻译
+
 在网页上选中任意文本，即可获得基于上下文的 AI 智能翻译。
 
 <img src="./docs/screenshots/翻译.png" alt="翻译功能" width="600">
 
 ### 💬 RAG 问答
+
 基于个人知识库进行智能对话。AI 会从您的笔记中检索相关上下文，提供准确的答案。
 
 <img src="./docs/screenshots/聊天.png" alt="聊天界面" width="600">
 
 ### 📝 笔记生成
+
 从网页内容自动生成结构化笔记，支持 AI 摘要和关键信息提取。
 
 <img src="./docs/screenshots/总览.png" alt="笔记生成" width="600">
 
 ### 📚 笔记管理
+
 浏览、搜索和管理您的笔记，支持标签筛选、日历视图和全文搜索。
 
 <img src="./docs/screenshots/笔记.png" alt="笔记管理" width="600">
+
+---
+
+## 🎬 实验性功能：视频字幕翻译
+
+> 💡 **想要实时视频字幕翻译功能？** 快来看看 [`video` 分支](https://github.com/snailfrying/flowers/tree/video)！
+
+`video` 分支包含一个实验性功能，支持在 YouTube 等平台上实时翻译视频字幕。特性包括字幕自动检测、播放器内开关按钮、智能批处理以及美观的叠加显示。
+
+```bash
+# 尝试视频字幕翻译功能：
+git checkout video
+```
+
+<img src="./docs/screenshots/字幕翻译.png" alt="视频字幕翻译" width="600">
 
 ---
 

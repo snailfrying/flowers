@@ -41,24 +41,43 @@
 ## 📸 Screenshots
 
 ### 🌐 Smart Translation
+
 Select any text on a webpage and instantly translate it with context-aware AI translation.
 
 <img src="./docs/screenshots/翻译.png" alt="Translation Feature" width="600">
 
 ### 💬 RAG-Powered Chat
+
 Ask questions grounded in your personal knowledge base. The AI retrieves relevant context from your notes to provide accurate answers.
 
 <img src="./docs/screenshots/聊天.png" alt="Chat Interface" width="600">
 
 ### 📝 Note Generation
+
 Automatically generate structured notes from web content with AI-powered summarization and key information extraction.
 
 <img src="./docs/screenshots/总览.png" alt="Note Generation" width="600">
 
 ### 📚 Note Management
+
 Browse, search, and manage your notes with tags, calendar view, and full-text search capabilities.
 
 <img src="./docs/screenshots/笔记.png" alt="Notes Management" width="600">
+
+---
+
+## 🎬 Experimental: Video Subtitle Translation
+
+> 💡 **Want real-time video subtitle translation?** Check out the [`video` branch](https://github.com/snailfrying/flowers/tree/video)!
+
+The `video` branch includes an experimental feature for translating video subtitles in real-time on YouTube and other platforms. Features include auto-detection of subtitles, in-player toggle button, smart batching, and stylish overlay display.
+
+```bash
+# To try the video subtitle translation feature:
+git checkout video
+```
+
+<img src="./docs/screenshots/字幕翻译.png" alt="Video Subtitle Translation" width="600">
 
 ---
 
