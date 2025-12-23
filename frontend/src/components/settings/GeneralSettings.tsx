@@ -7,9 +7,17 @@ import { useToast } from '@/components/common/Toaster';
 import { exportNotes } from '@/shared/api/notes';
 import { importFAQs } from '@/shared/api/faqs';
 import { useState } from 'react';
+import { Switch } from '@/components/ui/switch';
 
 export function GeneralSettings() {
-  const { language, theme, updateLanguage, updateTheme } = useSettingsStore();
+  const {
+    language,
+    theme,
+    fullPageEnabled,
+    updateLanguage,
+    updateTheme,
+    updateFullPageEnabled
+  } = useSettingsStore();
   const { t } = useTranslation();
   const { success, error: showError } = useToast();
   const [isExporting, setIsExporting] = useState(false);
@@ -122,6 +130,20 @@ export function GeneralSettings() {
         </div>
       </div>
 
+      {/* Full-Page Translation Toggle */}
+      <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border border-border/50">
+        <div className="space-y-0.5">
+          <Label className="text-base font-semibold">{t('settings.fullPageTranslation')}</Label>
+          <p className="text-sm text-muted-foreground">
+            {t('settings.fullPageTranslationHint')}
+          </p>
+        </div>
+        <Switch
+          checked={fullPageEnabled}
+          onCheckedChange={updateFullPageEnabled}
+        />
+      </div>
+
       {/* Data Management Section */}
       <div className="pt-6 border-t border-border">
         <h3 className="text-lg font-semibold mb-4">{t('settings.dataManagement')}</h3>
@@ -168,4 +190,3 @@ export function GeneralSettings() {
     </div>
   );
 }
-

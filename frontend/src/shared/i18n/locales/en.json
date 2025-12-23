@@ -132,6 +132,8 @@
     "importSuccess": "Import successful: {{success}} succeeded, {{failed}} failed",
     "languageChanged": "Language changed",
     "themeChanged": "Theme changed",
+    "fullPageTranslation": "Full-Page Translation (Bilingual)",
+    "fullPageTranslationHint": "Automatically translate the entire webpage and display translations below the original text.",
     "exportHint": "Export all notes data",
     "importFAQHint": "Supports JSON or CSV format",
     "actions": {

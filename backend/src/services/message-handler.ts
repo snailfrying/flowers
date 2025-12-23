@@ -57,14 +57,14 @@ export class ServiceWorkerMessageHandler {
   }
 
   private async initializeServices(): Promise<void> {
-    if (this.agent && this.syncService) return; // Already initialized
+    if (this.agent && this.syncService) return;
 
+    console.info('[Backend] initializeServices started');
     // Load settings from Chrome Storage before initializing services
-    // This ensures API key and baseUrl are loaded from user configuration
-    // getSettings() will automatically load from storage if cache is stale
+    // Use getSettings() instead of getSettingsSafe() to include apiKey for backend logic
     const settings = await getSettings();
     setLang(settings.language || 'zh');
-    console.info('[Backend] Settings after load:', {
+    console.info('[Backend] Settings loaded for initialization:', {
       hasBaseUrl: !!settings.baseUrl,
       baseUrl: settings.baseUrl || '(empty)',
       hasApiKey: !!settings.apiKey,
@@ -77,7 +77,6 @@ export class ServiceWorkerMessageHandler {
     });
 
     // Check if required settings are missing
-    // Check if required settings are missing (check both legacy and new providers)
     const hasLegacyConfig = settings.baseUrl && settings.baseUrl.trim() !== '';
     const hasProviders = settings.providers && settings.providers.length > 0;
 
@@ -116,6 +115,7 @@ export class ServiceWorkerMessageHandler {
 
     this.agent = new CoreAgent(ragService);
     this.syncService = new SyncService(this.notesStore, ragService);
+    console.info('[Backend] initializeServices completed');
   }
 
   /**
@@ -128,7 +128,6 @@ export class ServiceWorkerMessageHandler {
       console.info('[Backend] MessageHandler received:', { action, requestId, paramsKeys: Object.keys(params || {}) });
 
       // Initialize services if needed (lazy initialization)
-      console.info('[Backend] Initializing services...');
       await this.initializeServices();
       console.info('[Backend] Services initialized:', { hasAgent: !!this.agent, hasSyncService: !!this.syncService });
 
@@ -140,6 +139,19 @@ export class ServiceWorkerMessageHandler {
           console.info('[Backend] Calling agent.translate...', { textLength: (params as TranslateParams).text?.length || 0 });
           data = await this.agent!.translate(params as TranslateParams);
           console.info('[Backend] agent.translate result:', { resultLength: data?.length || 0 });
+          break;
+
+        case 'agent:translateFullPage':
+          console.info('[Backend] Calling agent.translate (full-page)...', {
+            textLength: (params as TranslateParams).text?.length || 0,
+            targetLang: (params as TranslateParams).targetLang,
+            requestId
+          });
+          data = await this.agent!.translate({ ...(params as TranslateParams), mode: 'full-page' });
+          console.info('[Backend] agent.translate (full-page) result:', {
+            resultLength: data?.length || 0,
+            requestId
+          });
           break;
 
         case 'agent:polish':
@@ -353,7 +365,7 @@ export class ServiceWorkerMessageHandler {
    * Handle stream messages (for chatStream)
    * Returns async generator for stream chunks
    */
-  async *handleStream(request: MessageRequest & { stream: true }): AsyncIterable<import('../types.js').StreamChunk & { trace?: import('../types.js').MCPTrace }> {
+  async * handleStream(request: MessageRequest & { stream: true }): AsyncIterable<import('../types.js').StreamChunk & { trace?: import('../types.js').MCPTrace }> {
     const { action, params } = request;
 
     if (action !== 'agent:chatStream') {

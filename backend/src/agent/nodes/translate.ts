@@ -21,14 +21,20 @@ export async function translateNode(client: LLMClient, params: TranslateParams):
   const isCJK = /[\u4e00-\u9fff]/.test(raw);
   const tokenCount = raw.split(/\s+/).filter(Boolean).length;
   const charCount = [...raw].length;
-  const isDictionaryCase = (isCJK && charCount <= 4) || (!isCJK && tokenCount <= 3);
+  const isSubtitle = params.mode === 'subtitle';
+  const isFullPage = params.mode === 'full-page';
+  // Only use dictionary mode if NOT subtitle or full-page mode
+  const isDictionaryCase = !isSubtitle && !isFullPage && ((isCJK && charCount <= 4) || (!isCJK && tokenCount <= 3));
 
   // Generate cache key from params
   const cacheKey = generateCacheKey({
     text: params.text,
     targetLang: params.targetLang,
     isDictionary: isDictionaryCase,
-    model: params.llmConfig?.chatModel || 'default'
+    mode: params.mode || 'default',
+    model: params.llmConfig?.chatModel || 'default',
+    context: params.context,
+    glossary: params.glossary
   });
 
   // Check cache first
@@ -41,7 +47,18 @@ export async function translateNode(client: LLMClient, params: TranslateParams):
 
   let system = '';
   let user = '';
-  if (isDictionaryCase) {
+  if (isFullPage) {
+    system = getPrompt('translate_fullpage_system', undefined as any, { targetLang: params.targetLang });
+    user = getPrompt('translate_fullpage_user', undefined as any, {
+      targetLang: params.targetLang,
+      text: raw,
+      context: params.context,
+      glossary: params.glossary
+    });
+  } else if (isSubtitle) {
+    system = getPrompt('translate_subtitle_system', undefined as any, { targetLang: params.targetLang });
+    user = getPrompt('translate_subtitle_user', undefined as any, { targetLang: params.targetLang, text: raw });
+  } else if (isDictionaryCase) {
     system = getPrompt('translate_dict_system', undefined as any, {
       targetLang: params.targetLang,
       sourceLang: params.sourceLang || 'Source Language'

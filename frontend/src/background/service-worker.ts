@@ -236,7 +236,11 @@ chrome.runtime.onMessage.addListener((message: any, sender: any, sendResponse: (
       } else if (message.action === 'translate') {
         backendMessage = {
           action: 'agent:translate',
-          params: { text: message.text || '', targetLang: message.targetLang || 'en' },
+          params: {
+            text: message.text || '',
+            targetLang: message.targetLang || 'en',
+            mode: message.mode
+          },
           requestId: `translate_${Date.now()}_${Math.random().toString(36).slice(2)}`
         };
         console.info('[Service Worker] Converted to MessageRequest:', backendMessage);
