@@ -672,7 +672,7 @@ function ensureBodyFallbackContainer(): HTMLDivElement {
   return bodyFallbackContainer;
 }
 
-async function showPopover(text: string, position: { x: number; y: number }) {
+async function showPopover(text: string, position: { x: number; y: number }, initialAction?: 'translate' | 'polish' | 'note' | null) {
   lastShowAt = Date.now();
   let depsLoaded = false;
   try {
@@ -733,6 +733,7 @@ async function showPopover(text: string, position: { x: number; y: number }) {
                 sourceUrl: sourceUrl,
                 position: position,
                 onClose: hidePopover,
+                initialAction: initialAction,
                 onFixed: (fixed: boolean) => {
                   isFixed = fixed;
                   if (fixed) {
@@ -1058,12 +1059,42 @@ window.addEventListener('scroll', () => {
 }, true);
 
 // Global hotkey: Alt+Q to force open popover at screen center with current selection
+// Keyboard shortcuts for quick actions (using Alt to avoid browser conflicts):
+//   Alt+T - Translate selected text
+//   Alt+P - Polish selected text
+//   Alt+N - Generate note from selected text
+//   Alt+Q / F2 - Open popover
 document.addEventListener('keydown', (e) => {
   try {
     const key = (e.key || '').toLowerCase();
     // Alt+D debug-beacon removed
     if (e.altKey && key === 'd') { return; }
-    const triggerHotkey = (e.altKey && key === 'q') || (e.ctrlKey && e.shiftKey && key === 'y') || key === 'f2';
+
+    // Quick action shortcuts (Alt+Key)
+    if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+      let action: 'translate' | 'polish' | 'note' | null = null;
+
+      if (key === 't') action = 'translate';
+      else if (key === 'p') action = 'polish';
+      else if (key === 'n') action = 'note';
+
+      if (action) {
+        const text = getSelectedText();
+        if (text && text.length >= MIN_SELECTION_CHARS) {
+          const position = getSelectionPosition();
+          console.log(`[Chroma] Shortcut Alt+${key.toUpperCase()} triggered: ${action}`);
+          showPopover(text, position, action);
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        } else {
+          console.log(`[Chroma] Shortcut Alt+${key.toUpperCase()}: no text selected`);
+        }
+      }
+    }
+
+    // Open popover hotkey
+    const triggerHotkey = (e.altKey && key === 'q') || key === 'f2';
     if (triggerHotkey) {
       let text = getSelectedText();
       if (!text) {

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/common/Toaster';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
@@ -24,13 +24,16 @@ interface SelectionPopoverProps {
   position: { x: number; y: number };
   onClose: () => void;
   onFixed?: (fixed: boolean) => void;
+  /** Auto-trigger an action when popover opens (for keyboard shortcuts) */
+  initialAction?: 'translate' | 'polish' | 'note' | null;
 }
 
 export function SelectionPopover({
   selectedText,
   sourceUrl,
   onClose,
-  onFixed
+  onFixed,
+  initialAction
 }: SelectionPopoverProps) {
   const { t, i18n } = useTranslation();
   const { success } = useToast();
@@ -256,6 +259,18 @@ export function SelectionPopover({
   const handlePopoverClick = () => {
     setUIInteracting(true);
   };
+
+  // Auto-trigger action from keyboard shortcut
+  useEffect(() => {
+    if (initialAction && !state.isProcessing && !state.result.value) {
+      const timer = setTimeout(() => {
+        if (initialAction === 'translate') handleTranslate();
+        else if (initialAction === 'polish') handlePolish();
+        else if (initialAction === 'note') handleGenerateNote();
+      }, 100); // Small delay to ensure UI is ready
+      return () => clearTimeout(timer);
+    }
+  }, [initialAction]); // Only run once on mount
 
   return (
     <div
