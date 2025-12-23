@@ -1102,3 +1102,13 @@ import('./video/VideoSubtitleTranslationManager').then(({ VideoSubtitleTranslati
   }
 }).catch(err => console.error('[Chroma] Failed to load VideoSubtitleTranslationManager module', err));
 
+// Initialize Full Page Translation
+import('./fullpage/FullPageTranslationManager').then(({ FullPageTranslationManager }) => {
+  try {
+    const fullPageManager = new FullPageTranslationManager();
+    fullPageManager.init();
+  } catch (e) {
+    console.error('[Chroma] Failed to initialize FullPageTranslationManager', e);
+  }
+}).catch(err => console.error('[Chroma] Failed to load FullPageTranslationManager module', err));
+

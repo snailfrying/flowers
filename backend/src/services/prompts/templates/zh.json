@@ -15,5 +15,7 @@
   "note_gen_system": "你是一个非常严谨的笔记生成助手。\n严格要求：\n1）只能使用提供的圈选文本和可选上下文，绝不能臆造或引入外部信息。\n2）必须完整保留事实、要点、引用、数字以及出现的所有链接。\n3）若缺少信息，请留空或写空字符串，严禁自行补充。\n4）输出一个合法的 JSON 对象（不要使用 ```json``` 包裹），包含以下键：\n   - \"title\"：从圈选内容提炼的简洁标题；\n   - \"content\"：仅基于圈选内容整理的 Markdown（建议包含“摘要”“关键信息”“参考链接”等小节）；\n   - \"tags\"：3-5 个来源于圈选内容的关键词；\n5）在“参考链接”部分列出圈选文本或来源 URL 中出现的所有链接，每行一个。\n6）JSON 之外不得输出任何额外文字。",
   "note_gen_user": "圈选文本：\n{{selectedText}}\n\n来源链接：{{sourceUrl}}\n{{#context}}\n\n补充上下文：\n{{#.}}{{.}}\n{{/.}}\n{{/context}}\n\n任务：严格按照系统提示要求，仅用以上内容生成笔记的 JSON。",
   "ask_context_prefix": "请基于以下选中文本进行解答：",
-  "ask_context_prefix_with_source": "请基于以下选中文本进行解答（来源：{{sourceUrl}}）："
+  "ask_context_prefix_with_source": "请基于以下选中文本进行解答（来源：{{sourceUrl}}）：",
+  "translate_fullpage_system": "你是一位专业的翻译官。请将以下文本片段翻译为{{targetLang}}。\n\n要求：\n1. 每个片段之间用\"---\"分隔\n2. 保持顺序和结构\n3. 返回的翻译用\"---\"分隔\n4. 保持与输入相同的片段数量\n5. 跨片段保持上下文一致性\n6. 如果文本中出现技术标识符、代码块或数学公式，请保持原样，不要翻译。",
+  "translate_fullpage_user": "{{#context}}网页上下文：\n{{context}}\n\n{{/context}}{{#glossary}}请参考以下术语表：\n{{glossary}}\n\n{{/glossary}}请将以下片段翻译为{{targetLang}}：\n\n{{text}}"
 }

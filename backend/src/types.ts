@@ -56,6 +56,7 @@ export interface Settings {
 
   language: Language;
   theme: 'light' | 'dark' | 'system';
+  fullPageEnabled?: boolean;
   mcpServices: MCPServiceConfig[];
 }
 
@@ -104,7 +105,9 @@ export interface TranslateParams {
   // Optional human-readable source language name to guide dictionary prompts
   sourceLang?: string;
   llmConfig?: LLMConfig;
-  mode?: 'default' | 'subtitle';
+  mode?: 'default' | 'subtitle' | 'full-page';
+  context?: string;
+  glossary?: string;
 }
 
 export interface PolishParams {

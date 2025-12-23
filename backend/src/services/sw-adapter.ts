@@ -40,6 +40,11 @@ export function setupMessageListener(): void {
 
   chrome.runtime.onMessage.addListener(
     (request: any, sender: any, sendResponse: (response: MessageResponse) => void) => {
+      console.info('[SW Adapter] Incoming message:', {
+        action: request?.action,
+        requestId: request?.requestId,
+        sender: sender?.tab?.url || 'extension'
+      });
       // Convert simple content script messages to MessageRequest format
       // Content script sends: { action: 'polish', text: '...' }
       // Backend expects: { action: 'agent:polish', params: { text: '...' }, requestId: '...' }
@@ -94,7 +99,9 @@ export function setupMessageListener(): void {
       // stays alive during async operations (like chrome.storage.local.set)
       (async () => {
         try {
+          console.info('[SW Adapter] Processing message:', messageRequest.action);
           const response = await getHandler().handleMessage(messageRequest);
+          console.info('[SW Adapter] Sending response for:', messageRequest.action, { success: response.success });
           sendResponse(response);
         } catch (error: any) {
           console.error('[SW Adapter] Message handler failed:', error);

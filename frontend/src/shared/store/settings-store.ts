@@ -22,6 +22,7 @@ interface SettingsStore {
   // State
   language: Language;
   theme: 'light' | 'dark' | 'system';
+  fullPageEnabled: boolean;
   settings: Partial<Omit<Settings, 'apiKey'>> & { baseUrl?: string }; // baseUrl is included but apiKey is not
   isLoading: boolean;
 
@@ -30,6 +31,7 @@ interface SettingsStore {
   loadSettings: () => Promise<void>;
   updateLanguage: (lang: Language) => Promise<void>;
   updateTheme: (theme: 'light' | 'dark' | 'system') => void;
+  updateFullPageEnabled: (enabled: boolean) => void;
   updateSettings: (updates: Partial<Settings>) => Promise<void>;
 
   // Provider Actions
@@ -49,6 +51,7 @@ export const useSettingsStore = create<SettingsStore>()(
     (set: (partial: Partial<SettingsStore> | ((state: SettingsStore) => Partial<SettingsStore>)) => void, get: () => SettingsStore) => ({
       language: 'zh',
       theme: 'system',
+      fullPageEnabled: false,
       settings: {
         providers: [],
         defaultProviderId: undefined,
@@ -98,6 +101,9 @@ export const useSettingsStore = create<SettingsStore>()(
         } else {
           root.classList.toggle('dark', theme === 'dark');
         }
+      },
+      updateFullPageEnabled: (enabled: boolean) => {
+        set({ fullPageEnabled: enabled });
       },
 
       updateSettings: async (updates: Partial<Settings>) => {
@@ -242,7 +248,11 @@ export const useSettingsStore = create<SettingsStore>()(
         }
         return localStorage;
       }),
-      partialize: (state: SettingsStore) => ({ language: state.language, theme: state.theme })
+      partialize: (state: SettingsStore) => ({
+        language: state.language,
+        theme: state.theme,
+        fullPageEnabled: state.fullPageEnabled
+      })
     }
   )
 );

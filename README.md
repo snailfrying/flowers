@@ -29,6 +29,7 @@
 - **🎨 Customizable Prompts** - Edit and manage AI prompts for each workflow
 - **🔄 Multi-Device Sync** - Keep your notes synchronized across devices
 - **🎬 Video Subtitle Translation** *(video branch)* - Real-time AI translation of video subtitles on YouTube and other platforms
+- **🌐 Full Page Translation** - Bilingual comparison mode with **Technical Content Protection** (skips code/math/diagrams) and **Smart Batching**
 
 ### 🚀 Highlights
 
@@ -49,6 +50,17 @@ Select any text on a webpage and instantly translate it with context-aware AI tr
 
 <img src="./docs/screenshots/翻译.png" alt="Translation Feature" width="600">
 
+### 🌐 Full Page Translation
+
+Translate entire webpages into a bilingual comparison format. Unlike standard translators, Flowers is designed for developers and power users:
+
+- **🛡️ Technical Content Protection**: Automatically identifies and skips code blocks (`<pre>`, `<code>`), math formulas (KaTeX, MathJax), and diagrams (Mermaid) to preserve technical integrity.
+- **🧠 Context-Aware Batching**: Intelligently merges multiple paragraphs into a single API request, maintaining context while significantly reducing token usage and latency.
+- **💉 Non-Intrusive Injection**: Uses a unique DOM injection method that preserves the original webpage structure and event listeners, ensuring compatibility with complex SPAs.
+- **🔄 Dynamic Content Support**: Real-time monitoring of DOM changes (via MutationObserver) to automatically translate newly loaded content (e.g., infinite scroll).
+
+<img src="./docs/screenshots/全屏翻译.png" alt="Full Page Translation" width="600">
+
 ### 💬 RAG-Powered Chat
 
 Ask questions grounded in your personal knowledge base. The AI retrieves relevant context from your notes to provide accurate answers.
@@ -65,7 +77,7 @@ Automatically generate structured notes from web content with AI-powered summari
 
 Browse, search, and manage your notes with tags, calendar view, and full-text search capabilities.
 
-<img src="./docs/screenshots/笔记.png" alt="Notes Management" width="600">
+<img src="./docs/screenshots/笔记管理.png" alt="Notes Management" width="600">
 
 ---
 
@@ -77,10 +89,9 @@ This branch includes experimental real-time video subtitle translation. Key feat
 
 - **🎯 Auto-Detection** - Automatically detects videos with subtitles on YouTube and other platforms
 - **🔘 Toggle Button** - In-player toggle button to enable/disable translation
-- **📝 Smart Batching** - Intelligently batches streaming subtitles for efficient translation
-- **🎨 Overlay Display** - Shows translated subtitles as a stylish overlay on the video
-- **⚡ Caching** - Caches translations to avoid redundant API calls
-- **🌐 Language Sync** - Automatically uses your preferred language from Settings
+- **📝 Real-time Batching** - Intelligently buffers and batches streaming subtitles to handle fast-paced dialogue without losing context.
+- **🎨 Overlay Display** - Shows translated subtitles as a stylish, non-blocking overlay on the video.
+- **⚡ Caching & Sync** - Caches translations to avoid redundant API calls and automatically uses your preferred language from Settings.
 
 ### Supported Platforms
 
@@ -106,9 +117,9 @@ This branch includes experimental real-time video subtitle translation. Key feat
 ┌─────────────────────────────────────────────────────────┐
 │                     Browser Extension                    │
 ├──────────────────┬──────────────────┬───────────────────┤
-│   Content Script │   Side Panel     │  Service Worker   │
 │   (Selection UI) │   (Workspace)    │  (API Bridge)     │
 │   (Video Trans)  │                  │                   │
+│   (Full Page)    │                  │                   │
 └────────┬─────────┴────────┬─────────┴─────────┬─────────┘
          │                  │                   │
          └──────────────────┼───────────────────┘
@@ -239,6 +250,13 @@ flowers/
 │   │   │       ├── SubtitleOverlayRenderer.ts
 │   │   │       ├── SubtitleToggleButton.ts
 │   │   │       └── VideoSubtitleTranslationManager.ts
+│   │   │   └── fullpage/# Full page translation
+│   │   │       ├── NodeSelector.ts
+│   │   │       ├── BatchProcessor.ts
+│   │   │       ├── DOMInjector.ts
+│   │   │       ├── DynamicContentObserver.ts
+│   │   │       ├── FloatingButton.ts
+│   │   │       └── FullPageTranslationManager.ts
 │   │   └── sidepanel/   # Main workspace
 │   └── package.json
 │

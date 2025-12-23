@@ -69,6 +69,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ Generic videos (TextTrack API)
 - 🚧 Netflix (Planned)
 
+### Full Page Translation (video branch)
+
+- 🌐 **Full Page Translation**: Bilingual comparison mode for entire webpages
+  - **NodeSelector**: Intelligent content identification with developer-focused filtering
+  - **BatchProcessor**: Context-aware batching to optimize API calls and preserve context
+  - **DOMInjector**: Non-intrusive injection with `data-flowers-translated` state tracking
+  - **DynamicContentObserver**: Real-time monitoring of DOM changes for SPA support
+  - **FloatingButton**: Quick-access toggle for full-page translation mode
+- 🛡️ **Technical Content Protection**: Automatically skips code blocks (`<pre>`, `<code>`), math formulas (KaTeX, MathJax), and diagrams (Mermaid)
+- 🧠 **Nesting Prevention**: Advanced algorithm to avoid redundant translations in nested DOM structures
+
 ### Technical Details
 
 - Smart batching: Waits for streaming subtitles to complete before translating
@@ -76,6 +87,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic language sync with user settings
 - Extension context invalidation handling for robustness
 - Proper cleanup on video removal
+- **Messaging Protocol Fix**: Resolved "Unknown translation error" by aligning Service Worker message routing with standard backend protocols
+- **Enhanced Logging**: Detailed lifecycle logging in `message-handler.ts` and `sw-adapter.ts` for better observability
 
 ---
 

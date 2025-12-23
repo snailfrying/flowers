@@ -126,6 +126,8 @@
     "importSuccess": "导入成功: {{success}} 成功, {{failed}} 失败",
     "languageChanged": "语言已更改",
     "themeChanged": "主题已更改",
+    "fullPageTranslation": "全文翻译 (双语对照)",
+    "fullPageTranslationHint": "自动翻译整个网页内容，并在原文下方显示译文。",
     "exportHint": "导出所有笔记数据",
     "importFAQHint": "支持 JSON 或 CSV 格式",
     "actions": {
