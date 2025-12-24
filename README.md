@@ -16,6 +16,15 @@
 
 ---
 
+## 📺 Demo
+
+<div align="center">
+  <video src="https://github.com/user-attachments/assets/6f4cb81d-d683-4c5d-8e07-0e6bf19d7fde" width="100%" controls autoplay loop muted></video>
+  <p><i>Experience the seamless AI-powered workflow of Flowers</i></p>
+</div>
+
+---
+
 ## ✨ Features
 
 ### 🎯 Core Capabilities
@@ -33,10 +42,10 @@
 
 - **Popup on Selection** - Instant AI tools when you highlight text
 - **Side Panel Workspace** - Integrated chat, notes, and settings
-- **Local-First** - Your data stays on your device
-- **Privacy-Focused** - No data collection, no tracking
-- **Extensible** - Plugin architecture for custom workflows
-- **Language-Aware Prompts** - Translation/Polish prompts automatically switch to the language you set in Settings
+- **Local-First & Privacy** - All notes and settings are stored locally in your browser. No data collection, no tracking.
+- **Extensible Architecture** - Plugin-based system for custom AI workflows
+- **Language-Aware Prompts** - Smart prompt switching ensures AI output matches your preferred UI language
+- **Bilingual Comparison** - Professional-grade full-page translation with technical content protection
 
 ---
 
