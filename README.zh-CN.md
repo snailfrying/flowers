@@ -16,6 +16,15 @@
 
 ---
 
+## 📺 演示视频
+
+<div align="center">
+  <video src="./docs/screenshots/flowers_8mb.mp4" width="100%" controls autoplay loop muted></video>
+  <p><i>体验 Flowers 带来的无缝 AI 增强工作流</i></p>
+</div>
+
+---
+
 ## ✨ 功能特性
 
 ### 🎯 核心能力
@@ -33,10 +42,10 @@
 
 - **划词弹窗** - 选中文本即可使用 AI 工具
 - **侧边栏工作区** - 集成聊天、笔记和设置
-- **本地优先** - 数据保存在您的设备上
-- **隐私保护** - 不收集数据，不追踪行为
-- **可扩展** - 插件架构支持自定义工作流
-- **语言自适应提示词** - 根据设置中的语言自动切换润色/翻译提示词与输出语言
+- **本地优先与隐私** - 所有笔记和设置均存储在浏览器本地。不收集数据，不追踪行为。
+- **可扩展架构** - 基于插件的系统，支持自定义 AI 工作流
+- **语言自适应提示词** - 智能提示词切换，确保 AI 输出与您设置的界面语言一致
+- **双语对照翻译** - 专业级全文翻译，支持技术内容保护
 
 ---
 
@@ -239,7 +248,7 @@ flowers/
 │   │   ├── components/  # React 组件
 │   │   ├── background/  # Service Worker
 │   │   ├── content/     # 内容脚本
-│   │   │   └── video/   # 视频字幕翻译（video 分支）
+│   │   │   └── video/   # 视频字幕翻译
 │   │   │       ├── VideoSubtitleDetector.ts      # 视频字幕检测器
 │   │   │       ├── SubtitleExtractor.ts          # 字幕提取器
 │   │   │       ├── SubtitleTranslator.ts         # 字幕翻译器
