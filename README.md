@@ -19,7 +19,7 @@
 ## 📺 Demo
 
 <div align="center">
-  <video src="./docs/screenshots/flowers_8mb.mp4" width="100%" controls autoplay loop muted></video>
+  <video src="https://github.com/user-attachments/assets/6f4cb81d-d683-4c5d-8e07-0e6bf19d7fde" width="100%" controls autoplay loop muted></video>
   <p><i>Experience the seamless AI-powered workflow of Flowers</i></p>
 </div>
 
