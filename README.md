@@ -29,90 +29,79 @@
 
 ### 🎯 Core Capabilities
 
-- **🌐 Smart Translation** - Context-aware translation with editable terminology
-- **✨ AI Polish** - Professional text refinement with multiple tone options
-- **📝 Note Generation** - Auto-generate structured notes from web content
-- **💬 RAG-Powered Chat** - Ask questions grounded in your personal knowledge base
-- **🎨 Customizable Prompts** - Edit and manage AI prompts for each workflow
-- **🔄 Multi-Device Sync** - Keep your notes synchronized across devices
-- **🎬 Video Subtitle Translation** - Real-time AI translation of video subtitles on YouTube and other platforms
-- **🌐 Full Page Translation** - Bilingual comparison mode with **Technical Content Protection** (skips code/math/diagrams) and **Smart Batching**
+| Feature | Description |
+|---------|-------------|
+| 🌐 **Smart Translation** | Context-aware translation with editable terminology |
+| ✨ **AI Polish** | Professional text refinement with multiple tone options |
+| 📝 **Note Generation** | Auto-generate structured notes from web content |
+| 💬 **RAG-Powered Chat** | Ask questions grounded in your personal knowledge base |
+| 📄 **PDF Translation** | Select and translate text directly within PDF documents |
+| 🎬 **Video Subtitle Translation** | Real-time AI translation of video subtitles (YouTube, etc.) |
+| 🌐 **Full Page Translation** | Bilingual comparison mode with technical content protection |
+| 🎨 **Customizable Prompts** | Edit and manage AI prompts for each workflow |
 
 ### 🚀 Highlights
 
 - **Popup on Selection** - Instant AI tools when you highlight text
+- **PDF Support** - Built-in PDF reader with full translation capabilities
 - **Side Panel Workspace** - Integrated chat, notes, and settings
-- **Local-First & Privacy** - All notes and settings are stored locally in your browser. No data collection, no tracking.
+- **Local-First & Privacy** - All notes and settings stored locally. No data collection.
 - **Extensible Architecture** - Plugin-based system for custom AI workflows
-- **Language-Aware Prompts** - Smart prompt switching ensures AI output matches your preferred UI language
-- **Bilingual Comparison** - Professional-grade full-page translation with technical content protection
 
 ---
 
 ## 📸 Screenshots
 
-### 🌐 Smart Translation
+> 💡 **Tip**: Watch the [Demo Video](#-demo) above for a comprehensive walkthrough of all features.
+
+<details>
+<summary><b>🌐 Smart Translation</b></summary>
 
 Select any text on a webpage and instantly translate it with context-aware AI translation.
 
 <img src="./docs/screenshots/翻译.png" alt="Translation Feature" width="600">
+</details>
 
-### 🌐 Full Page Translation
+<details>
+<summary><b>📄 PDF Translation</b></summary>
 
-Translate entire webpages into a bilingual comparison format. Unlike standard translators, Flowers is designed for developers and power users:
+Open any PDF in the built-in Flowers PDF Reader. Select text to translate, polish, or generate notes - just like on regular web pages.
 
-- **🛡️ Technical Content Protection**: Automatically identifies and skips code blocks (`<pre>`, `<code>`), math formulas (KaTeX, MathJax), and diagrams (Mermaid) to preserve technical integrity.
-- **🧠 Context-Aware Batching**: Intelligently merges multiple paragraphs into a single API request, maintaining context while significantly reducing token usage and latency.
-- **💉 Non-Intrusive Injection**: Uses a unique DOM injection method that preserves the original webpage structure and event listeners, ensuring compatibility with complex SPAs.
-- **🔄 Dynamic Content Support**: Real-time monitoring of DOM changes (via MutationObserver) to automatically translate newly loaded content (e.g., infinite scroll).
+- Automatic PDF redirect to Flowers reader
+- Full popover functionality (translate, polish, notes, ask)
+- Pin, drag, and position the popover anywhere
+- Smooth scrolling with zoom controls
+
+</details>
+
+<details>
+<summary><b>🌐 Full Page Translation</b></summary>
+
+Translate entire webpages into a bilingual comparison format with:
+
+- 🛡️ **Technical Content Protection** - Skips code, math, diagrams
+- 🧠 **Context-Aware Batching** - Optimized API usage
+- 💉 **Non-Intrusive Injection** - Preserves page functionality
 
 <img src="./docs/screenshots/全屏翻译.png" alt="Full Page Translation" width="600">
+</details>
 
-### 🎬 Video Subtitle Translation
+<details>
+<summary><b>🎬 Video Subtitle Translation</b></summary>
 
-Flowers includes high-performance real-time video subtitle translation. Key features:
+Real-time video subtitle translation with intelligent batching and caching.
 
 <img src="./docs/screenshots/字幕翻译.png" alt="Video Subtitle Translation" width="600">
 
-- **🎯 Auto-Detection** - Automatically detects videos with subtitles on YouTube and other platforms
-- **🔘 Toggle Button** - In-player toggle button to enable/disable translation
-- **📝 Real-time Batching** - Intelligently buffers and batches streaming subtitles to handle fast-paced dialogue without losing context.
-- **🎨 Overlay Display** - Shows translated subtitles as a stylish, non-blocking overlay on the video.
-- **⚡ Caching & Sync** - Caches translations to avoid redundant API calls and automatically uses your preferred language from Settings.
+**Supported Platforms**: YouTube (DOM & TextTrack), Generic (TextTrack)
+</details>
 
-#### Supported Platforms
-
-| Platform | Subtitle Source | Status |
-|----------|----------------|--------|
-| YouTube  | DOM Captions   | ✅ Supported |
-| YouTube  | TextTrack API  | ✅ Supported |
-| Generic  | TextTrack API  | ✅ Supported |
-| Netflix  | -              | 🚧 Planned |
-
-#### How to Use
-
-1. Navigate to a YouTube video with subtitles enabled
-2. Look for the **🌐 Translation** icon in the video player controls
-3. Click the icon to enable real-time subtitle translation
-4. Translated subtitles will appear as a yellow overlay above the original subtitles
-
-### 💬 RAG-Powered Chat
-
-Ask questions grounded in your personal knowledge base. The AI retrieves relevant context from your notes to provide accurate answers.
+<details>
+<summary><b>💬 RAG Chat & 📝 Notes</b></summary>
 
 <img src="./docs/screenshots/聊天.png" alt="Chat Interface" width="400">
-
-### 📝 Note Generation
-
-Automatically generate structured notes from web content with AI-powered summarization and key information extraction.
-
-<img src="./docs/screenshots/总览.png" alt="Note Generation" width="400">
-
-### 📚 Note Management
-
-Browse, search, and manage your notes with tags, calendar view, and full-text search capabilities.
-
 <img src="./docs/screenshots/笔记管理.png" alt="Notes Management" width="400">
+</details>
 
 ---
 
@@ -122,9 +111,10 @@ Browse, search, and manage your notes with tags, calendar view, and full-text se
 ┌─────────────────────────────────────────────────────────┐
 │                     Browser Extension                    │
 ├──────────────────┬──────────────────┬───────────────────┤
-│   (Selection UI) │   (Workspace)    │  (API Bridge)     │
-│   (Video Trans)  │                  │                   │
-│   (Full Page)    │                  │                   │
+│   Selection UI   │   Workspace      │   API Bridge      │
+│   PDF Viewer     │                  │                   │
+│   Video Trans    │                  │                   │
+│   Full Page      │                  │                   │
 └────────┬─────────┴────────┬─────────┴─────────┬─────────┘
          │                  │                   │
          └──────────────────┼───────────────────┘
@@ -135,7 +125,6 @@ Browse, search, and manage your notes with tags, calendar view, and full-text se
                     │  • LLM Client  │
                     │  • RAG Engine  │
                     │  • Storage     │
-                    │  • Sync        │
                     └────────────────┘
 ```
 
@@ -151,52 +140,29 @@ Browse, search, and manage your notes with tags, calendar view, and full-text se
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+# Clone
+git clone https://github.com/snailfrying/flowers.git
+cd flowers
 
-   ```bash
-   git clone https://github.com/snailfrying/flowers.git
-   cd flowers
-   ```
+# Install dependencies
+cd backend && npm install
+cd ../frontend && npm install
 
-2. **Install dependencies**
+# Configure API keys
+cp backend/env.yaml.example backend/env.yaml
+# Edit backend/env.yaml with your API key
 
-   ```bash
-   # Backend
-   cd backend
-   npm install
+# Build
+cd backend && npm run build
+cd ../frontend && npm run build
 
-   # Frontend
-   cd ../frontend
-   npm install
-   ```
-
-3. **Configure API keys**
-
-   ```bash
-   # Copy example config
-   cp backend/env.yaml.example backend/env.yaml
-   
-   # Edit with your API key
-   # vim backend/env.yaml
-   ```
-
-4. **Build the extension**
-
-   ```bash
-   # Build backend
-   cd backend
-   npm run build
-
-   # Build frontend
-   cd ../frontend
-   npm run build
-   ```
-
-5. **Load in browser**
-   - Open `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select `frontend/dist/` directory
+# Load in browser
+# 1. Open chrome://extensions/
+# 2. Enable "Developer mode"
+# 3. Click "Load unpacked"
+# 4. Select frontend/dist/ directory
+```
 
 ---
 
@@ -204,29 +170,21 @@ Browse, search, and manage your notes with tags, calendar view, and full-text se
 
 ### Text Selection Tools
 
-1. Highlight any text on a webpage
-2. Click the Flowers icon in the popup
-3. Choose from:
-   - **Translate** - Translate to your target language
-   - **Polish** - Refine and improve the text
-   - **Generate Note** - Create a structured note
-   - **Ask AI** - Get AI insights about the selection
+1. Highlight any text on a webpage (or PDF)
+2. The Flowers popover appears automatically
+3. Choose: **Translate** | **Polish** | **Generate Note** | **Ask AI**
+
+### PDF Documents
+
+PDFs are automatically opened in the Flowers PDF Reader with full translation support.
 
 ### Side Panel Workspace
 
-1. Click the Flowers extension icon
-2. Access three main sections:
-   - **💬 Chat** - Converse with AI using your knowledge base
-   - **📝 Notes** - Browse and manage your notes
-   - **⚙️ Settings** - Configure models, prompts, and preferences
+Click the Flowers extension icon to access:
 
-### Note Management
-
-- **Create**: Generate notes from web content or manual input
-- **Edit**: Modify titles, content, and tags (generated notes always keep original facts and links)
-- **Search**: Find notes by keywords or tags
-- **Export**: Download as Markdown or JSON
-- **Calendar Filter**: Calendar view highlights dates that contain notes so you can filter with a single click
+- **💬 Chat** - Converse with AI using your knowledge base
+- **📝 Notes** - Browse and manage your notes
+- **⚙️ Settings** - Configure models, prompts, and preferences
 
 ---
 
@@ -236,74 +194,36 @@ Browse, search, and manage your notes with tags, calendar view, and full-text se
 
 ```
 flowers/
-├── backend/          # AI orchestration layer
+├── backend/              # AI orchestration layer
 │   ├── src/
-│   │   ├── agent/   # Workflow nodes
-│   │   ├── services/# LLM, RAG, prompts
-│   │   └── storage/ # Data persistence
-│   └── package.json
+│   │   ├── agent/        # Workflow nodes
+│   │   ├── services/     # LLM, RAG, prompts
+│   │   └── storage/      # Data persistence
 │
-├── frontend/         # Browser extension UI
+├── frontend/             # Browser extension UI
 │   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── background/  # Service worker
-│   │   ├── content/     # Content scripts
-│   │   │   └── video/   # Video subtitle translation
-│   │   │       ├── VideoSubtitleDetector.ts
-│   │   │       ├── SubtitleExtractor.ts
-│   │   │       ├── SubtitleTranslator.ts
-│   │   │       ├── SubtitleOverlayRenderer.ts
-│   │   │       ├── SubtitleToggleButton.ts
-│   │   │       └── VideoSubtitleTranslationManager.ts
-│   │   │   └── fullpage/# Full page translation
-│   │   │       ├── NodeSelector.ts
-│   │   │       ├── BatchProcessor.ts
-│   │   │       ├── DOMInjector.ts
-│   │   │       ├── DynamicContentObserver.ts
-│   │   │       ├── FloatingButton.ts
-│   │   │       └── FullPageTranslationManager.ts
-│   │   └── sidepanel/   # Main workspace
-│   └── package.json
-│
-├── LICENSE
-└── README.md
+│   │   ├── components/   # React components
+│   │   ├── background/   # Service worker
+│   │   ├── content/      # Content scripts
+│   │   │   ├── video/    # Video subtitle translation
+│   │   │   └── fullpage/ # Full page translation
+│   │   ├── pages/
+│   │   │   └── pdf-viewer/  # PDF reader
+│   │   └── sidepanel/    # Main workspace
 ```
 
 ### Development Mode
 
 ```bash
-# Backend (watch mode)
-cd backend
-npm run dev
-
-# Frontend (with HMR)
-cd frontend
-npm run dev
-```
-
-### Testing
-
-```bash
-# Run tests
-npm run test
-
-# Run linter
-npm run lint
+cd backend && npm run dev    # Backend (watch mode)
+cd frontend && npm run dev   # Frontend (with HMR)
 ```
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
-
-### Quick Contribution Steps
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feat/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feat/amazing-feature`)
-5. Open a Pull Request
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ---
 
@@ -312,10 +232,8 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 - [ ] Firefox extension support
 - [ ] Local LLM integration (Ollama, LM Studio)
 - [ ] Prompt version control
-- [ ] Multi-language prompt templates
-- [ ] Advanced RAG features (hybrid search, re-ranking)
+- [ ] Advanced RAG features
 - [ ] Mobile companion app
-- [ ] Plugin marketplace
 
 ---
 
@@ -324,47 +242,26 @@ We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
 <details>
 <summary><b>Q: Is my data sent to external servers?</b></summary>
 
-A: Only AI API calls (to OpenAI or your configured provider) are sent externally. All notes and settings are stored locally in your browser.
+A: Only AI API calls are sent externally. All notes and settings are stored locally in your browser.
 </details>
 
 <details>
 <summary><b>Q: Can I use this with local LLMs?</b></summary>
 
-A: Yes! Configure any OpenAI-compatible API endpoint in settings. Works with Ollama, LM Studio, and other local inference servers.
+A: Yes! Configure any OpenAI-compatible API endpoint. Works with Ollama, LM Studio, etc.
 </details>
 
 <details>
 <summary><b>Q: How do I customize prompts?</b></summary>
 
-A: Go to Settings → Prompt Management. You can edit system prompts for each workflow (translation, polish, note generation, etc.).
-</details>
-
-<details>
-<summary><b>Q: Can I export my notes?</b></summary>
-
-A: Yes! Use the Export button in the Notes page to download all notes as Markdown or JSON.
+A: Go to Settings → Prompt Management to edit system prompts for each workflow.
 </details>
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **Personal Use Non-Commercial License**.
-
-- ✅ Personal use
-- ✅ Modification and distribution (non-commercial)
-- ❌ Commercial use
-- ❌ Selling or monetizing
-
-See [LICENSE](./LICENSE) for full details.
-
----
-
-## 🙏 Acknowledgments
-
-- Built with [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), and [Tailwind CSS](https://tailwindcss.com/)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Icons from [Lucide](https://lucide.dev/)
+**Personal Use Non-Commercial License** - See [LICENSE](./LICENSE) for details.
 
 ---
 

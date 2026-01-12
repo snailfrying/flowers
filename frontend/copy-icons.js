@@ -40,8 +40,18 @@ const rulesDist = path.join(__dirname, 'dist', 'rules.json');
 if (fs.existsSync(rulesSrc)) {
   fs.copyFileSync(rulesSrc, rulesDist);
   console.log('✓ Copied rules.json');
-} else {
   console.warn(`⚠ Warning: rules.json not found in ${rulesSrc}`);
+}
+
+// Copy pdf.worker.min.js (v3)
+const pdfWorkerSrc = path.join(__dirname, 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.min.js');
+const pdfWorkerDist = path.join(__dirname, 'dist', 'pdf.worker.min.js');
+
+if (fs.existsSync(pdfWorkerSrc)) {
+  fs.copyFileSync(pdfWorkerSrc, pdfWorkerDist);
+  console.log('✓ Copied pdf.worker.min.js');
+} else {
+  console.warn(`⚠ Warning: pdf.worker.min.js not found in ${pdfWorkerSrc}`);
 }
 
 console.log('Build assets copied successfully!');

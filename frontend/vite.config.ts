@@ -12,7 +12,10 @@ export default defineConfig({
       disableAutoLaunch: true,
       browser: 'chrome',
       // Avoid remote schema fetch during manifest validation (offline safe)
-      skipManifestValidation: true
+      skipManifestValidation: true,
+      additionalInputs: [
+        'src/pages/pdf-viewer/index.html'
+      ]
     })
   ],
   resolve: {
