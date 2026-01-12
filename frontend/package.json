@@ -27,6 +27,7 @@
     "date-fns": "^4.1.0",
     "i18next": "^23.9.0",
     "lucide-react": "^0.552.0",
+    "pdfjs-dist": "3.11.174",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^14.0.0",

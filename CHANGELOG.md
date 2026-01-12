@@ -5,46 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.1.0] - 2025-01-20
+## [0.3.0] - 2026-01-12
 
 ### Added
 
-- 🌐 **Smart Translation**: Context-aware translation with editable terminology
-- ✨ **AI Polish**: Professional text refinement with multiple tone options
-- 📝 **Note Generation**: Auto-generate structured notes from web content
-- 💬 **RAG-Powered Chat**: Ask questions grounded in your personal knowledge base
-- 🎨 **Customizable Prompts**: Edit and manage AI prompts for each workflow
-- 🔄 **Multi-Device Sync**: Keep your notes synchronized across devices
-- 📱 **Selection Popover**: Instant AI tools when you highlight text on web pages
-- 🎯 **Side Panel Workspace**: Integrated chat, notes, and settings interface
-- 🌍 **Internationalization**: Full support for English and Chinese (简体中文)
-- 💾 **Data Export**: Export notes as Markdown or JSON format
-- 🔒 **Local-First Architecture**: All data stored locally in browser IndexedDB
-- 🔐 **Privacy-Focused**: No data collection, no tracking
+- 📄 **PDF Translation Support**: Full translation capabilities within PDF documents
+  - **Built-in PDF Reader**: Automatic redirect of PDF links to Flowers PDF Reader
+  - **Text Selection**: Select any text in PDFs to translate, polish, or generate notes
+  - **Full Popover Features**: Same popover UI as web pages with pin, drag, and close functionality
+  - **Smooth Scrolling**: Professional PDF viewing experience with zoom controls
+  - **pdfjs-dist Integration**: High-fidelity PDF rendering with text layer support
 
 ### Technical
 
-- Built with TypeScript for type safety
-- React 18+ with modern hooks and components
-- Tailwind CSS for styling
-- Vite for fast development and building
-- Chrome Extension Manifest V3 support
-- Service Worker architecture for background processing
-- Vector search using HNSW algorithm (hnswlib-wasm)
-- Support for multiple LLM providers (OpenAI-compatible, Ollama, DashScope, etc.)
-
-### Documentation
-
-- Comprehensive README in English and Chinese
-- Contributing guidelines (CONTRIBUTING.md)
-- Backend and Frontend specific documentation
-- API documentation in code comments
-
-### Security
-
-- API keys stored securely in Chrome Storage (not in code)
-- Environment configuration via `env.yaml` (not committed to repo)
-- No sensitive data in version control
+- Added `pdf-viewer` page component with React integration
+- Implemented `declarativeNetRequest` dynamic rules for PDF redirect
+- Integrated `pdfjs-dist` v3.x for PDF rendering
+- Added `--scale-factor` CSS variable support for text layer alignment
+- Proper popover positioning with fixed/unfixed state management
 
 ---
 
@@ -90,13 +68,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [0.1.0] - 2025-01-20
 
 ### Added
 
-- Language-aware prompt switching so Translate/Polish outputs always match the UI language
-- Note generation now strictly preserves selected content and automatically appends all source links
-- Calendar view shows subtle markers on days that contain notes for quick filtering
+- 🌐 **Smart Translation**: Context-aware translation with editable terminology
+- ✨ **AI Polish**: Professional text refinement with multiple tone options
+- 📝 **Note Generation**: Auto-generate structured notes from web content
+- 💬 **RAG-Powered Chat**: Ask questions grounded in your personal knowledge base
+- 🎨 **Customizable Prompts**: Edit and manage AI prompts for each workflow
+- 🔄 **Multi-Device Sync**: Keep your notes synchronized across devices
+- 📱 **Selection Popover**: Instant AI tools when you highlight text on web pages
+- 🎯 **Side Panel Workspace**: Integrated chat, notes, and settings interface
+- 🌍 **Internationalization**: Full support for English and Chinese (简体中文)
+- 💾 **Data Export**: Export notes as Markdown or JSON format
+- 🔒 **Local-First Architecture**: All data stored locally in browser IndexedDB
+- 🔐 **Privacy-Focused**: No data collection, no tracking
+
+### Technical
+
+- Built with TypeScript for type safety
+- React 18+ with modern hooks and components
+- Tailwind CSS for styling
+- Vite for fast development and building
+- Chrome Extension Manifest V3 support
+- Service Worker architecture for background processing
+- Vector search using HNSW algorithm (hnswlib-wasm)
+- Support for multiple LLM providers (OpenAI-compatible, Ollama, DashScope, etc.)
+
+### Documentation
+
+- Comprehensive README in English and Chinese
+- Contributing guidelines (CONTRIBUTING.md)
+- Backend and Frontend specific documentation
+- API documentation in code comments
+
+### Security
+
+- API keys stored securely in Chrome Storage (not in code)
+- Environment configuration via `env.yaml` (not committed to repo)
+- No sensitive data in version control
+
+---
+
+## [Unreleased]
 
 ### Planned
 
@@ -112,5 +127,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[0.3.0]: https://github.com/snailfrying/flowers/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/snailfrying/flowers/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/snailfrying/flowers/releases/tag/v0.1.0

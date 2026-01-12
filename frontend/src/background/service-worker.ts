@@ -9,6 +9,8 @@ declare const chrome: {
     onInstalled: { addListener: (cb: (details: any) => void) => void };
     onMessage: { addListener: (cb: (message: any, sender: any, sendResponse: (res: any) => void) => void) => void };
     sendMessage: (message: any) => Promise<any>;
+    lastError?: { message?: string };
+    id: string;
   };
   storage?: { local: { set: (items: Record<string, any>) => Promise<void> } };
   sidePanel?: { open: (opts?: { tabId?: number; windowId?: number }) => Promise<void> };
@@ -79,16 +81,103 @@ async function bootstrap() {
   }
 }
 
+// Helper to ensure PDF redirect rule is up-to-date
+// This is critical because the extension ID can change in development, 
+// and the rule must be registered with the correct ID.
+async function ensurePDFRedirectRule() {
+  const RULE_ID = 1001;
+
+  try {
+    // Check existing rules
+    // @ts-ignore
+    const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
+    const existingRule = existingRules.find((r: any) => r.id === RULE_ID);
+
+    // Construct the target redirect URL
+    const redirectUrl = `chrome-extension://${chrome.runtime.id}/src/pages/pdf-viewer/index.html?file=\\0`;
+
+    // If rule exists and has correct redirect, skip update
+    if (existingRule && existingRule.action.redirect.regexSubstitution === redirectUrl) {
+      console.log('[Service Worker] PDF redirect rule is already up-to-date');
+      return;
+    }
+
+    console.log('[Service Worker] Updating PDF redirect rule...', {
+      oldSubstitution: existingRule?.action?.redirect?.regexSubstitution,
+      newSubstitution: redirectUrl
+    });
+
+    const rule = {
+      id: RULE_ID,
+      priority: 1,
+      action: {
+        type: 'redirect',
+        redirect: {
+          // @ts-ignore
+          regexSubstitution: redirectUrl
+        }
+      },
+      condition: {
+        // Matches:
+        // 1. URLs ending in .pdf (with optional query params)
+        // 2. URLs containing /pdf/ path segment (like arxiv.org/pdf/1234)
+        regexFilter: "^(http|https|file)://.*(\\.pdf(\\?.*)?|/pdf/.*)$",
+        resourceTypes: ['main_frame'],
+        // @ts-ignore
+        excludedInitiatorDomains: [chrome.runtime.id]
+      }
+    };
+
+    // @ts-ignore
+    await chrome.declarativeNetRequest.updateDynamicRules({
+      removeRuleIds: [RULE_ID],
+      addRules: [rule]
+    });
+    console.log('[Service Worker] PDF redirect rule updated successfully');
+  } catch (e) {
+    console.error('[Service Worker] Failed to update PDF redirect rules:', e);
+  }
+}
+
 // Handle extension install/update
 // @ts-ignore - Chrome API
-chrome.runtime.onInstalled.addListener((details: any) => {
-  if (details.reason === 'install') {
-    console.log('Chroma Notes installed');
+chrome.runtime.onInstalled.addListener(async (details: any) => {
+  if (details.reason === 'install' || details.reason === 'update') {
+    console.log('Chroma Notes installed/updated');
     // Open side panel on install if possible
     // @ts-ignore
     chrome.sidePanel?.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => { });
-  } else if (details.reason === 'update') {
-    console.log('Chroma Notes updated');
+
+    // Create Context Menu for manual open
+    // @ts-ignore
+    chrome.contextMenus.create({
+      id: 'open-in-flowers-pdf',
+      title: 'Open in Flowers PDF Reader',
+      contexts: ['page', 'link']
+    }, () => {
+      if (chrome.runtime.lastError) {
+        // Ignore error if item already exists
+      }
+    });
+
+    // Ensure rules are set up immediately on install
+    await ensurePDFRedirectRule();
+  }
+});
+
+// Handle Context Menu Clicks
+// @ts-ignore
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'open-in-flowers-pdf') {
+    // Prefer linkUrl if clicked on a link, otherwise pageUrl
+    const targetUrl = info.linkUrl || info.pageUrl;
+    if (targetUrl) {
+      // @ts-ignore
+      const viewerUrl = chrome.runtime.getURL(`src/pages/pdf-viewer/index.html?file=${encodeURIComponent(targetUrl)}`);
+      // Update current tab
+      // @ts-ignore
+      chrome.tabs.update(tab.id, { url: viewerUrl });
+    }
   }
 });
 
@@ -375,4 +464,6 @@ chrome.runtime.onMessage.addListener((message: any, sender: any, sendResponse: (
 });
 
 // Initialize backend after setting up message listeners
+// Initialize backend after setting up message listeners
 bootstrap();
+ensurePDFRedirectRule().catch(e => console.error('[Service Worker] Failed to ensure PDF rules on startup:', e));
