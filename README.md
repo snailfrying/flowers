@@ -44,9 +44,47 @@
 
 - **Popup on Selection** - Instant AI tools when you highlight text
 - **PDF Support** - Built-in PDF reader with full translation capabilities
+- **Multi-Provider Support** - Connect to OpenAI, Ollama, DeepSeek, DashScope, Anthropic, Google, and more
+- **Custom Prompts** - Full control over AI behavior for each workflow
 - **Side Panel Workspace** - Integrated chat, notes, and settings
 - **Local-First & Privacy** - All notes and settings stored locally. No data collection.
-- **Extensible Architecture** - Plugin-based system for custom AI workflows
+
+---
+
+## 🔧 Flexible Configuration
+
+> 💡 **The core strength of Flowers is its configurability.** Adapt the extension to your exact needs.
+
+### Multi-Provider Support
+
+Flowers supports a wide range of LLM providers out of the box:
+
+| Provider | Type | Notes |
+|----------|------|-------|
+| **OpenAI** | Cloud | GPT-4o, GPT-4, GPT-3.5-turbo |
+| **Ollama** | Local | Run models locally with full privacy |
+| **DeepSeek** | Cloud | Cost-effective high-quality models |
+| **DashScope** | Cloud | Alibaba Cloud Qwen models |
+| **Anthropic** | Cloud | Claude models |
+| **Google** | Cloud | Gemini models |
+| **Any OpenAI-Compatible** | Custom | LM Studio, vLLM, LocalAI, etc. |
+
+**Configuration is simple:**
+
+1. Go to **Settings** → **Model Configuration**
+2. Add a new provider with Base URL, API Key, and model list
+3. Select your preferred Chat Model and Embedding Model
+4. Save and start using!
+
+### Custom Prompts
+
+Every AI workflow (Translation, Polish, Note Generation, Chat) uses customizable system prompts:
+
+- **Edit prompts** to match your domain or writing style
+- **Language-aware switching** ensures output matches your UI language
+- **Full prompt visibility** - see exactly what the AI receives
+
+Go to **Settings** → **Prompt Management** to customize.
 
 ---
 
