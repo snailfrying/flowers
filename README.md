@@ -47,7 +47,10 @@
 - **Multi-Provider Support** - Connect to OpenAI, Ollama, DeepSeek, DashScope, Anthropic, Google, and more
 - **Custom Prompts** - Full control over AI behavior for each workflow
 - **Side Panel Workspace** - Integrated chat, notes, and settings
-- **Local-First & Privacy** - All notes and settings stored locally. No data collection.
+- **Local-First & Privacy** - All notes and settings are stored locally in your browser. No data collection, no tracking.
+- **Extensible Architecture** - Plugin-based system for custom AI workflows
+- **Language-Aware Prompts** - Smart prompt switching ensures AI output matches your preferred UI language
+- **Bilingual Comparison** - Professional-grade full-page translation with technical content protection
 
 ---
 
