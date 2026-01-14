@@ -48,9 +48,9 @@ type PopoverAction =
     | { type: 'RESET_RESULT' };
 
 // Initial state factory
-function createInitialState(selectedText: string): PopoverState {
+function createInitialState({ selectedText, initialFixed }: { selectedText: string, initialFixed: boolean }): PopoverState {
     return {
-        isFixed: false,
+        isFixed: initialFixed,
         isProcessing: false,
         actionType: null,
         text: {
@@ -121,12 +121,17 @@ function popoverReducer(state: PopoverState, action: PopoverAction): PopoverStat
     }
 }
 
-export function usePopoverState(selectedText: string) {
+export function usePopoverState(selectedText: string, initialFixed: boolean = false) {
     const [state, dispatch] = useReducer(
         popoverReducer,
-        selectedText,
+        { selectedText, initialFixed },
         createInitialState
     );
+
+    // Sync isFixed from outside if it changes
+    useEffect(() => {
+        dispatch({ type: 'SET_FIXED', payload: initialFixed });
+    }, [initialFixed]);
 
     // Update editable text when selectedText changes
     useEffect(() => {

@@ -244,6 +244,25 @@ function getSelectedText(): string | null {
   return text || null;
 }
 
+// Handle clicks outside the popover to hide it
+document.addEventListener('mousedown', (e: MouseEvent) => {
+  if (isFixed || uiInteracting || isDraggingGlobal) {
+    return;
+  }
+
+  const target = e.target as HTMLElement;
+  // If clicked inside popoverHost or portal, ignore
+  if (shadowHost && shadowHost.contains(target)) {
+    return;
+  }
+
+  // If we are showing popover, hide it
+  if (popoverContainer && popoverContainer.style.opacity === '1') {
+    console.log('[Chroma] Click outside detected, hiding popover');
+    hidePopover();
+  }
+}, { capture: true, passive: true });
+
 // Listen for selection changes to handle dynamic text selection
 document.addEventListener('selectionchange', () => {
   try {
@@ -398,7 +417,7 @@ function createPopoverContainer(): HTMLDivElement {
     width: 100vw;
     height: 100vh;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 2147483647;
     isolation: isolate;
   `;
   shadowRootRef.appendChild(portalContainer);
@@ -428,76 +447,22 @@ function createPopoverContainer(): HTMLDivElement {
     #chroma-portal-root > * {
       pointer-events: auto;
     }
-    /* Radix Select Content styles */
-    [data-radix-select-content] {
-      z-index: 99999 !important;
-      background: #ffffff !important;
-      border: 1px solid rgba(0,0,0,.12) !important;
-      border-radius: 8px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,.15) !important;
-      max-height: 300px !important;
-      overflow-y: auto !important;
-      padding: 4px !important;
-    }
-    [data-radix-select-content] [data-radix-select-item] {
-      padding: 8px 12px !important;
-      cursor: pointer !important;
-      border-radius: 4px !important;
-      background: transparent !important;
-      color: #111 !important;
-    }
-    [data-radix-select-content] [data-radix-select-item]:hover {
-      background: rgba(0,0,0,.05) !important;
-    }
-    [data-radix-select-content] [data-radix-select-item][data-highlighted] {
-      background: rgba(0,0,0,.08) !important;
-    }
-    @media (prefers-color-scheme: dark) {
-      [data-radix-select-content] {
-        background: #1e1e1e !important;
-        border-color: rgba(255,255,255,.12) !important;
-        color: #e5e5e5 !important;
-      }
-      [data-radix-select-content] [data-radix-select-item] {
-        color: #e5e5e5 !important;
-      }
-      [data-radix-select-content] [data-radix-select-item]:hover {
-        background: rgba(255,255,255,.08) !important;
-      }
-      [data-radix-select-content] [data-radix-select-item][data-highlighted] {
-        background: rgba(255,255,255,.12) !important;
-      }
-    }
-    /* Label background styles - force with !important */
-    [data-label="source"],
-    [data-label="target"] {
-      background-color: rgba(0, 0, 0, 0.08) !important;
-      color: #111 !important;
-      padding: 4px 8px !important;
-      border-radius: 4px !important;
-      display: inline-block !important;
-      border: none !important;
-      box-shadow: none !important;
-      font-size: 12px !important;
-    }
-    @media (prefers-color-scheme: dark) {
-      [data-label="source"],
-      [data-label="target"] {
-        background-color: rgba(255, 255, 255, 0.1) !important;
-        color: #e5e5e5 !important;
-      }
+    /* Radix Select Content position override - ensure it stays within viewport */
+    #chroma-portal-root [data-radix-select-viewport] {
+      scrollbar-width: thin;
+      scrollbar-color: hsl(var(--border)) transparent;
     }
   `;
   shadowRootRef.appendChild(portalStyle);
 
-  // Removed debug badge (CN)
   // Real container inside shadow (lower z-index than portal for proper layering)
   popoverContainer = document.createElement('div');
   popoverContainer.id = 'chroma-notes-popover-root';
   popoverContainer.style.cssText = `
     position: absolute;
-    z-index: 1;
+    z-index: 100;
     pointer-events: auto;
+    box-shadow: none !important;
   `;
   // Track mousedown/mouseup for interaction detection (don't interfere with click)
   popoverContainer.addEventListener('mousedown', () => { uiInteracting = true; }, { passive: true });
@@ -606,9 +571,6 @@ function setupDragHandling() {
 
         if (popoverContainer) {
           popoverContainer.style.cursor = '';
-          if (!isFixed) {
-            isFixed = true;
-          }
         }
 
         setTimeout(() => {

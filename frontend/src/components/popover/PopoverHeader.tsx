@@ -25,44 +25,33 @@ export function PopoverHeader({
         <div
             data-draggable="true"
             className={cn(
-                "flex items-center justify-between px-3 py-2 select-none",
-                "bg-zinc-50/50 dark:bg-zinc-900/50",
-                "border-b border-zinc-100 dark:border-zinc-800",
-                !isFixed && "cursor-move"
+                "flex items-center justify-between px-4 py-2 select-none",
+                !isFixed && "cursor-grab active:cursor-grabbing"
             )}
         >
             <div className="flex items-center">
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{title}</span>
+                <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{title}</span>
             </div>
 
             <div className="flex items-center gap-0.5">
                 <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     className={cn(
-                        'h-7 w-7 rounded-md',
-                        'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200',
-                        'hover:bg-zinc-100 dark:hover:bg-zinc-800',
-                        'transition-colors',
-                        isFixed && 'text-blue-600 hover:text-blue-700 bg-blue-50/50 dark:text-blue-400 dark:bg-blue-900/20 dark:hover:text-blue-300'
+                        "h-7 w-7 p-0 rounded-full border-0 bg-transparent shadow-none",
+                        "text-zinc-400 hover:text-blue-500 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all",
+                        isFixed && "text-blue-500"
                     )}
                     onClick={onToggleFixed}
-                    onMouseDown={(e) => e.preventDefault()}
                     title={isFixed ? unpinTooltip : pinTooltip}
                 >
-                    <Pin className={cn("h-4 w-4 transition-transform", isFixed ? "rotate-0" : "rotate-45")} />
+                    <Pin className={cn("h-3.5 w-3.5 transition-transform duration-300", !isFixed && "rotate-45")} />
                 </Button>
                 <Button
                     variant="ghost"
-                    size="icon"
-                    className={cn(
-                        'h-7 w-7 rounded-md',
-                        'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200',
-                        'hover:bg-zinc-100 dark:hover:bg-zinc-800',
-                        'transition-colors'
-                    )}
+                    size="sm"
+                    className="h-7 w-7 p-0 rounded-full border-0 bg-transparent shadow-none text-zinc-400 hover:text-red-500 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-all"
                     onClick={onClose}
-                    onMouseDown={(e) => e.preventDefault()}
                     title={closeTooltip}
                 >
                     <X className="h-4 w-4" />

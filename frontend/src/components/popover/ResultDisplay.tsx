@@ -52,12 +52,12 @@ export function ResultDisplay({
     return (
         <div className="animate-in fade-in slide-in-from-bottom-2 duration-200">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-zinc-500">{labels.result}</span>
+                <span className="text-xs text-zinc-400">{labels.result}</span>
                 <div className="flex gap-1">
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 w-6 p-0 text-zinc-400 hover:text-zinc-700"
+                        className="h-6 w-6 p-0 text-zinc-300 hover:text-zinc-600 transition-colors"
                         onClick={onToggleEdit}
                         title={labels.edit}
                     >
@@ -67,8 +67,7 @@ export function ResultDisplay({
             </div>
 
             <div className={cn(
-                "w-full rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3",
-                "border border-zinc-100 dark:border-zinc-800",
+                "w-full rounded-lg bg-zinc-50/80 dark:bg-zinc-800/40 p-3",
                 "text-sm leading-relaxed",
                 "max-h-[320px] overflow-y-auto"
             )}>
@@ -79,11 +78,15 @@ export function ResultDisplay({
                         className="min-h-[160px] max-h-[320px] bg-transparent border-0 p-0 focus-visible:ring-0 resize-none"
                     />
                 ) : (
-                    <div className="prose prose-sm dark:prose-invert max-w-none space-y-2 pr-1">
+                    <div className="prose prose-sm dark:prose-invert max-w-none pr-1 border-0">
                         <ReactMarkdown components={{
-                            p: ({ children }) => <p className="mb-1.5 last:mb-0">{children}</p>,
-                            ul: ({ children }) => <ul className="list-disc pl-4 mb-1.5">{children}</ul>,
-                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-1.5">{children}</ol>
+                            p: ({ children }) => <p className="mb-1.5 last:mb-0 text-[13px] text-zinc-600 dark:text-zinc-400 leading-normal">{children}</p>,
+                            ul: ({ children }) => <ul className="list-disc pl-4 mb-1.5 space-y-0.5 text-[13px] text-zinc-600 dark:text-zinc-400 leading-normal">{children}</ul>,
+                            ol: ({ children }) => <ol className="list-decimal pl-4 mb-1.5 space-y-0.5 text-[13px] text-zinc-600 dark:text-zinc-400 leading-normal">{children}</ol>,
+                            li: ({ children }) => <li className="pl-0.5">{children}</li>,
+                            h2: ({ children }) => <h2 className="text-xs font-bold mb-1 mt-2 text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">{children}</h2>,
+                            h3: ({ children }) => <h3 className="text-[13px] font-bold mb-0.5 text-zinc-800 dark:text-zinc-200">{children}</h3>,
+                            strong: ({ children }) => <strong className="font-bold text-zinc-800 dark:text-zinc-200">{children}</strong>
                         }}>
                             {editableResult}
                         </ReactMarkdown>

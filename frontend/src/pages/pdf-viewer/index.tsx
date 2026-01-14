@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react';
 import { createRoot } from 'react-dom/client';
 import * as pdfjsLib from 'pdfjs-dist';
 import 'pdfjs-dist/web/pdf_viewer.css';
@@ -72,6 +72,9 @@ type PopupState = {
 // Loading states
 type LoadingState = 'idle' | 'loading' | 'loaded' | 'error';
 
+// Cache for page dimensions to avoid re-fetching
+const pageDimensionsCache = new Map<string, { width: number; height: number }>();
+
 const PDFViewer: React.FC = () => {
     const [pdfDoc, setPdfDoc] = useState<any>(null);
     const [scale, setScale] = useState(1.5);
@@ -98,7 +101,7 @@ const PDFViewer: React.FC = () => {
     const [isDragging, setIsDragging] = useState(false);
     const dragStartRef = useRef({ x: 0, y: 0, left: 0, top: 0 });
 
-    // Generate page numbers array
+    // Generate page numbers array - memoized
     const pages = useMemo(() =>
         Array.from({ length: numPages }, (_, i) => i + 1),
         [numPages]
@@ -119,6 +122,9 @@ const PDFViewer: React.FC = () => {
             setLoadingState('loading');
             setErrorMessage('');
 
+            // Clear dimension cache for new document
+            pageDimensionsCache.clear();
+
             // Normalize URL for GitHub/GitLab etc.
             const normalizedUrl = normalizePdfUrl(fileUrl);
             console.log('[PDF Viewer] Loading:', { original: fileUrl, normalized: normalizedUrl });
@@ -132,7 +138,6 @@ const PDFViewer: React.FC = () => {
             const pdf = await loadingTask.promise;
             setPdfDoc(pdf);
             setNumPages(pdf.numPages);
-            // Initially show first few pages
             setVisiblePages(new Set([1, 2, 3]));
             setLoadingState('loaded');
         } catch (error) {
@@ -146,14 +151,24 @@ const PDFViewer: React.FC = () => {
         loadPDF();
     }, [loadPDF]);
 
-    // Handle text selection
+    // Handle text selection - throttled
     useEffect(() => {
         let lastShowTime = 0;
         const MIN_CHARS = 2;
 
         const handleMouseUp = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
-            if (target.closest('#chroma-popover') || target.closest('[data-popover-container]')) {
+            // Bridge for UI interactions (clicking buttons, dropdowns etc)
+            const isUIInteracting = (window as any).__CHROMA_UI_INTERACTING;
+
+            if (
+                isUIInteracting ||
+                target.closest('#chroma-popover') ||
+                target.closest('[data-popover-container]') ||
+                target.closest('[data-radix-portal]') ||
+                target.closest('[data-radix-select-viewport]') ||
+                target.classList.contains('radix-portal')
+            ) {
                 return;
             }
 
@@ -171,7 +186,7 @@ const PDFViewer: React.FC = () => {
                         visible: true,
                         isFixed: false
                     });
-                } else if (!popoverState?.isFixed) {
+                } else if (popoverState && !popoverState.isFixed) {
                     const timeSinceShow = Date.now() - lastShowTime;
                     if (timeSinceShow > 200) {
                         setPopoverState(null);
@@ -192,14 +207,19 @@ const PDFViewer: React.FC = () => {
             if (popoverRef.current && popoverState) {
                 const dx = e.clientX - dragStartRef.current.x;
                 const dy = e.clientY - dragStartRef.current.y;
-                setPopoverState({
-                    ...popoverState,
-                    position: {
-                        x: dragStartRef.current.left + dx,
-                        y: dragStartRef.current.top + dy
-                    },
-                    isFixed: true
-                });
+
+                // Only trigger if moved enough (3px) to prevent accidental clicks
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                    setIsDragging(true);
+                    setPopoverState({
+                        ...popoverState,
+                        position: {
+                            x: dragStartRef.current.left + dx,
+                            y: dragStartRef.current.top + dy
+                        }
+                        // Manual pinning only: do not set isFixed: true here
+                    });
+                }
             }
         };
 
@@ -227,66 +247,73 @@ const PDFViewer: React.FC = () => {
         return () => container?.removeEventListener('scroll', handleScroll);
     }, [popoverState]);
 
-    // Track visible pages using IntersectionObserver for lazy loading
+    // Track visible pages using IntersectionObserver - OPTIMIZED
+    // Key fix: don't include visiblePages in deps to avoid recreating observer
     useEffect(() => {
         const container = containerRef.current;
         if (!container || !pdfDoc) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
-                const newVisible = new Set(visiblePages);
-                let needsUpdate = false;
+                setVisiblePages(prev => {
+                    const next = new Set(prev);
+                    let changed = false;
 
-                entries.forEach(entry => {
-                    const pageNum = parseInt(entry.target.getAttribute('data-page') || '0', 10);
-                    if (pageNum > 0) {
+                    entries.forEach(entry => {
+                        const pageNum = parseInt(entry.target.getAttribute('data-page') || '0', 10);
+                        if (pageNum <= 0) return;
+
                         if (entry.isIntersecting) {
-                            // Add this page and neighbors
+                            // Add this page and neighbors for preloading
                             [pageNum - 1, pageNum, pageNum + 1].forEach(p => {
-                                if (p >= 1 && p <= numPages && !newVisible.has(p)) {
-                                    newVisible.add(p);
-                                    needsUpdate = true;
+                                if (p >= 1 && p <= numPages && !next.has(p)) {
+                                    next.add(p);
+                                    changed = true;
                                 }
                             });
-                            // Update current page
+
+                            // Update current page indicator
                             if (entry.intersectionRatio > 0.5) {
                                 setCurrentPage(pageNum);
                                 setPageInput(String(pageNum));
                             }
                         }
-                    }
-                });
+                    });
 
-                if (needsUpdate) {
-                    setVisiblePages(newVisible);
-                }
+                    // Only return new Set if actually changed - prevents unnecessary re-renders
+                    return changed ? next : prev;
+                });
             },
             {
                 root: container,
-                rootMargin: '200px 0px', // Pre-load pages 200px before they're visible
-                threshold: [0, 0.5, 1]
+                rootMargin: '300px 0px',
+                threshold: [0, 0.5]
             }
         );
 
-        // Observe all page placeholders
-        const placeholders = container.querySelectorAll('.page-placeholder');
-        placeholders.forEach(p => observer.observe(p));
+        // Observe after a small delay to let DOM settle
+        requestAnimationFrame(() => {
+            const placeholders = container.querySelectorAll('.page-placeholder');
+            placeholders.forEach(p => observer.observe(p));
+        });
 
         return () => observer.disconnect();
-    }, [pdfDoc, numPages, visiblePages]);
+    }, [pdfDoc, numPages]); // Removed visiblePages dependency
 
-    const handleClose = () => {
+    const handleClose = useCallback(() => {
         setPopoverState(null);
-    };
+    }, []);
 
-    const handleFixed = (fixed: boolean) => {
-        if (popoverState) {
-            setPopoverState({ ...popoverState, isFixed: fixed });
+    const handleFixed = useCallback((fixed: boolean) => {
+        setPopoverState(prev => prev ? { ...prev, isFixed: fixed } : null);
+    }, []);
+
+    const startDrag = useCallback((e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('button') || target.closest('input') || target.closest('textarea') || target.closest('[data-radix-portal]')) {
+            return;
         }
-    };
 
-    const startDrag = (e: React.MouseEvent) => {
-        if ((e.target as HTMLElement).closest('button')) return;
         if (popoverRef.current && popoverState) {
             setIsDragging(true);
             dragStartRef.current = {
@@ -297,10 +324,10 @@ const PDFViewer: React.FC = () => {
             };
             e.preventDefault();
         }
-    };
+    }, [popoverState]);
 
-    // Toolbar actions
-    const handleDownload = () => {
+    // Toolbar actions - memoized
+    const handleDownload = useCallback(() => {
         if (originalUrl) {
             const normalizedUrl = normalizePdfUrl(originalUrl);
             const link = document.createElement('a');
@@ -311,13 +338,13 @@ const PDFViewer: React.FC = () => {
             link.click();
             document.body.removeChild(link);
         }
-    };
+    }, [originalUrl]);
 
-    const handlePrint = () => {
+    const handlePrint = useCallback(() => {
         window.print();
-    };
+    }, []);
 
-    const handleFullscreen = () => {
+    const handleFullscreen = useCallback(() => {
         if (rootRef.current) {
             if (document.fullscreenElement) {
                 document.exitFullscreen();
@@ -325,9 +352,9 @@ const PDFViewer: React.FC = () => {
                 rootRef.current.requestFullscreen();
             }
         }
-    };
+    }, []);
 
-    const handlePageInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handlePageInput = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             const page = parseInt(pageInput, 10);
             if (page >= 1 && page <= numPages) {
@@ -336,9 +363,9 @@ const PDFViewer: React.FC = () => {
                 setPageInput(String(currentPage));
             }
         }
-    };
+    }, [pageInput, numPages, currentPage]);
 
-    const goToPage = (page: number) => {
+    const goToPage = useCallback((page: number) => {
         const container = containerRef.current;
         if (!container) return;
         const placeholder = container.querySelector(`[data-page="${page}"]`);
@@ -346,7 +373,6 @@ const PDFViewer: React.FC = () => {
             placeholder.scrollIntoView({ behavior: 'smooth', block: 'start' });
             setCurrentPage(page);
             setPageInput(String(page));
-            // Ensure the target page and neighbors are visible
             setVisiblePages(prev => {
                 const next = new Set(prev);
                 [page - 1, page, page + 1].forEach(p => {
@@ -355,25 +381,25 @@ const PDFViewer: React.FC = () => {
                 return next;
             });
         }
-    };
+    }, [numPages]);
 
-    const handleZoom = (delta: number) => {
+    const handleZoom = useCallback((delta: number) => {
         setScale(s => Math.max(0.5, Math.min(3, s + delta)));
-    };
+    }, []);
 
-    const handleFitWidth = () => {
+    const handleFitWidth = useCallback(() => {
         const container = containerRef.current;
         if (container && pdfDoc) {
             const containerWidth = container.clientWidth - 40;
             const newScale = containerWidth / 612;
             setScale(Math.max(0.5, Math.min(3, newScale)));
         }
-    };
+    }, [pdfDoc]);
 
-    const toggleDarkMode = () => {
+    const toggleDarkMode = useCallback(() => {
         setDarkMode(d => !d);
         document.documentElement.classList.toggle('dark-mode');
-    };
+    }, []);
 
     // Loading state
     if (loadingState === 'loading') {
@@ -543,20 +569,21 @@ const PDFViewer: React.FC = () => {
                                     position: 'fixed',
                                     left: `${popoverState.position.x}px`,
                                     top: `${popoverState.position.y}px`,
-                                    zIndex: 2147483647,
+                                    zIndex: 1000000,
                                     cursor: isDragging ? 'grabbing' : 'auto'
                                 }}
-                                onMouseDown={popoverState.isFixed ? undefined : startDrag}
                             >
                                 <div
                                     data-draggable="true"
                                     onMouseDown={startDrag}
                                     style={{
                                         position: 'absolute',
-                                        top: 0, left: 0, right: 80,
-                                        height: 40,
+                                        top: 0,
+                                        left: 0,
+                                        right: '80px',
+                                        height: '40px',
                                         cursor: 'grab',
-                                        zIndex: 1
+                                        zIndex: 10
                                     }}
                                 />
                                 <SelectionPopover
@@ -565,6 +592,7 @@ const PDFViewer: React.FC = () => {
                                     position={popoverState.position}
                                     onClose={handleClose}
                                     onFixed={handleFixed}
+                                    isFixed={popoverState.isFixed}
                                 />
                             </div>
                         )}
@@ -576,27 +604,46 @@ const PDFViewer: React.FC = () => {
 };
 
 /**
- * Page placeholder that only renders content when visible
- * Uses IntersectionObserver for lazy loading
+ * Page placeholder - MEMOIZED to prevent unnecessary re-renders
+ * Only re-renders when props actually change
  */
-const PagePlaceholder: React.FC<{
+const PagePlaceholder = memo<{
     pageNumber: number;
     pdf: any;
     scale: number;
     isVisible: boolean;
-}> = ({ pageNumber, pdf, scale, isVisible }) => {
-    const [dimensions, setDimensions] = useState({ width: 612 * scale, height: 792 * scale });
+}>(({ pageNumber, pdf, scale, isVisible }) => {
+    // Cache key for dimensions
+    const cacheKey = `${pdf.fingerprints?.[0] || 'pdf'}-${pageNumber}`;
+    const cached = pageDimensionsCache.get(cacheKey);
 
-    // Get page dimensions on mount
+    const [dimensions, setDimensions] = useState({
+        width: cached ? cached.width * scale : 612 * scale,
+        height: cached ? cached.height * scale : 792 * scale
+    });
+
+    // Get page dimensions once and cache
     useEffect(() => {
+        if (cached) {
+            setDimensions({
+                width: cached.width * scale,
+                height: cached.height * scale
+            });
+            return;
+        }
+
         pdf.getPage(pageNumber).then((page: any) => {
             const viewport = page.getViewport({ scale: 1 });
+            pageDimensionsCache.set(cacheKey, {
+                width: viewport.width,
+                height: viewport.height
+            });
             setDimensions({
                 width: viewport.width * scale,
                 height: viewport.height * scale
             });
         });
-    }, [pdf, pageNumber, scale]);
+    }, [pdf, pageNumber, scale, cacheKey, cached]);
 
     return (
         <div
@@ -625,21 +672,29 @@ const PagePlaceholder: React.FC<{
             )}
         </div>
     );
-};
+});
+
+PagePlaceholder.displayName = 'PagePlaceholder';
 
 /**
- * Actual PDF page renderer with render task management
+ * Actual PDF page renderer - MEMOIZED with render task management
  */
-const PDFPage: React.FC<{ pdf: any, pageNumber: number, scale: number }> = ({ pdf, pageNumber, scale }) => {
+const PDFPage = memo<{ pdf: any; pageNumber: number; scale: number }>(({ pdf, pageNumber, scale }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const textLayerRef = useRef<HTMLDivElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const renderTaskRef = useRef<any>(null);
+    const isRenderingRef = useRef(false);
 
     useEffect(() => {
         let cancelled = false;
 
         const renderPage = async () => {
+            // Prevent concurrent renders
+            if (isRenderingRef.current) {
+                return;
+            }
+
             // Cancel any ongoing render
             if (renderTaskRef.current) {
                 try {
@@ -650,9 +705,14 @@ const PDFPage: React.FC<{ pdf: any, pageNumber: number, scale: number }> = ({ pd
                 renderTaskRef.current = null;
             }
 
+            isRenderingRef.current = true;
+
             try {
                 const page = await pdf.getPage(pageNumber);
-                if (cancelled) return;
+                if (cancelled) {
+                    isRenderingRef.current = false;
+                    return;
+                }
 
                 const viewport = page.getViewport({ scale });
                 const canvas = canvasRef.current;
@@ -676,19 +736,27 @@ const PDFPage: React.FC<{ pdf: any, pageNumber: number, scale: number }> = ({ pd
                     try {
                         await renderTaskRef.current.promise;
                     } catch (e: any) {
-                        // Ignore cancelled render errors
-                        if (e?.name === 'RenderingCancelledException') return;
+                        if (e?.name === 'RenderingCancelledException') {
+                            isRenderingRef.current = false;
+                            return;
+                        }
                         throw e;
                     }
 
-                    if (cancelled) return;
+                    if (cancelled) {
+                        isRenderingRef.current = false;
+                        return;
+                    }
 
                     // Render text layer
                     if (textLayerRef.current) {
                         textLayerRef.current.innerHTML = '';
                         textLayerRef.current.style.setProperty('--scale-factor', `${scale}`);
                         const textContent = await page.getTextContent();
-                        if (cancelled) return;
+                        if (cancelled) {
+                            isRenderingRef.current = false;
+                            return;
+                        }
 
                         // @ts-ignore
                         pdfjsLib.renderTextLayer({
@@ -700,8 +768,13 @@ const PDFPage: React.FC<{ pdf: any, pageNumber: number, scale: number }> = ({ pd
                     }
                 }
             } catch (error: any) {
-                if (error?.name === 'RenderingCancelledException') return;
-                console.error(`Error rendering page ${pageNumber}:`, error);
+                if (error?.name === 'RenderingCancelledException') {
+                    // Expected when cancelled
+                } else {
+                    console.error(`Error rendering page ${pageNumber}:`, error);
+                }
+            } finally {
+                isRenderingRef.current = false;
             }
         };
 
@@ -725,7 +798,9 @@ const PDFPage: React.FC<{ pdf: any, pageNumber: number, scale: number }> = ({ pd
             <div className="textLayer" ref={textLayerRef}></div>
         </div>
     );
-};
+});
+
+PDFPage.displayName = 'PDFPage';
 
 const root = createRoot(document.getElementById('app')!);
 root.render(<PDFViewer />);

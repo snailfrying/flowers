@@ -2,90 +2,161 @@
 @tailwind utilities;
 
 /*
- * IMPORTANT: CSS variables are scoped to Shadow DOM containers only.
- * We do NOT use @tailwind base or :root to avoid polluting the host page styles.
- * All styles are applied via specific selectors targeting our Shadow DOM containers.
+ * IMPORTANT: CSS variables are strictly scoped to Shadow DOM containers.
+ * Colors and styles are aligned with a premium, soft flat design.
  */
 
-/* Light Theme - Flat Design (scoped to our containers) */
+/* Global Popover & Portal Root */
 #chroma-notes-popover-root,
 #chroma-portal-root {
-  /* Light Theme - Flat Design */
-  --background: 0 0% 100%; /* Pure white */
-  --foreground: 0 0% 10.2%; /* #1A1A1A - High contrast text */
-  --primary: 0 0% 9%; /* Dark text for buttons */
-  --primary-foreground: 0 0% 98%; /* White text on dark bg */
-  --secondary: 0 0% 96.1%; /* #F5F5F5 - Subtle background */
-  --secondary-foreground: 0 0% 10.2%; /* Dark text */
-  --muted: 0 0% 96.1%; /* #F5F5F5 - Input backgrounds */
-  --muted-foreground: 0 0% 40%; /* #666666 - Secondary text */
-  --accent: 0 0% 93.3%; /* #EEEEEE - Hover states */
-  --accent-foreground: 0 0% 10.2%; /* Dark text */
+  /* Aligned with PDF Viewer but softened for premium feel */
+  --background: 0 0% 100%;
+  /* #ffffff */
+  --foreground: 0 0% 20%;
+  /* #333333 */
+  --primary: 0 0% 20%;
+  /* #333333 */
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  /* #f5f5f5 */
+  --secondary-foreground: 0 0% 20%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45%;
+  /* #737373 - Softened secondary text */
+  --accent: 0 0% 94.1%;
+  /* #f0f0f0 */
+  --accent-foreground: 0 0% 20%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 87.8%; /* #E0E0E0 - Subtle borders */
-  --input: 0 0% 94.1%; /* #F0F0F0 - Input backgrounds */
-  --ring: 0 0% 9%; /* Focus ring */
-  --radius: 0.375rem; /* 6px - Modern rounded corners */
-  --card: 0 0% 98%; /* #FAFAFA - Card background */
-  --card-foreground: 0 0% 10.2%;
-  --popover: 0 0% 100%; /* Pure white */
-  --popover-foreground: 0 0% 10.2%;
-  /* Subtle shadows for flat design */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 6px 0 rgba(0, 0, 0, 0.08);
+  --border: 0 0% 98%;
+  /* Soft border for subtle separation - barely visible */
+  --input: 0 0% 96.1%;
+  --ring: 0 0% 20%;
+  --radius: 16px;
+  /* Matching rounded-2xl for "cute" look */
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 20%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 20%;
 
-  /* Base styles for our containers */
-  font-family: system-ui, -apple-system, sans-serif;
+  /* PREMIUM FLAT SHADOW - Subtle and soft */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.03), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: none !important;
+  --shadow-inner: none !important;
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
-  color: hsl(var(--foreground));
   box-sizing: border-box;
 }
 
-/* Dark Theme - Flat Design (scoped to our containers) */
+/* Dark Theme - Derived from PDF Viewer dark mode tokens */
 #chroma-notes-popover-root.dark,
 #chroma-portal-root.dark {
-  --background: 0 0% 7.1%; /* #121212 - Material Dark */
-  --foreground: 0 0% 89.8%; /* #E5E5E5 - High contrast text */
-  --primary: 0 0% 98%; /* Light text for buttons */
-  --primary-foreground: 0 0% 9%; /* Dark text on light bg */
-  --secondary: 0 0% 11.8%; /* #1E1E1E - Subtle background */
-  --secondary-foreground: 0 0% 89.8%; /* Light text */
-  --muted: 0 0% 14.5%; /* #252525 - Input backgrounds */
-  --muted-foreground: 0 0% 70%; /* #B3B3B3 - Secondary text */
-  --accent: 0 0% 16.5%; /* #2A2A2A - Hover states */
-  --accent-foreground: 0 0% 89.8%; /* Light text */
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 20%; /* #333333 - Subtle borders */
-  --input: 0 0% 14.5%; /* #252525 - Input backgrounds */
-  --ring: 0 0% 83.1%;
-  --card: 0 0% 11.8%; /* #1E1E1E - Card background */
-  --card-foreground: 0 0% 89.8%;
-  --popover: 0 0% 7.1%; /* #121212 */
-  --popover-foreground: 0 0% 89.8%;
-  /* Subtle shadows for dark theme */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 2px 6px 0 rgba(0, 0, 0, 0.5);
+  --background: 0 0% 12%;
+  /* #1f1f1f - Slightly lighter dark bg */
+  --foreground: 0 0% 88%;
+  /* #e0e0e0 */
+  --primary: 0 0% 88%;
+  /* #e0e0e0 */
+  --primary-foreground: 0 0% 12%;
+  --secondary: 0 0% 18%;
+  /* #2d2d2d */
+  --secondary-foreground: 0 0% 88%;
+  --muted: 0 0% 22%;
+  /* #383838 */
+  --muted-foreground: 0 0% 60%;
+  /* #999999 */
+  --accent: 0 0% 22%;
+  /* #383838 */
+  --accent-foreground: 0 0% 88%;
+  --border: 0 0% 20%;
+  /* #333333 */
+  --card: 0 0% 18%;
+  --card-foreground: 0 0% 88%;
+  --popover: 0 0% 12%;
+  --popover-foreground: 0 0% 88%;
 }
 
-/* Apply border-border only to elements inside our containers, not globally */
+/* 
+ * MEGA-SPECIFIC FLAT OVERRIDES 
+ */
 #chroma-notes-popover-root *,
-#chroma-notes-popover-root *::before,
-#chroma-notes-popover-root *::after,
-#chroma-portal-root *,
-#chroma-portal-root *::before,
-#chroma-portal-root *::after {
+#chroma-portal-root * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  filter: none !important;
   box-sizing: border-box;
-  border-color: hsl(var(--border));
+  border-color: hsl(var(--border)) !important;
 }
 
-/* Ensure SVG icons have a default size if not specified, to prevent giant icons */
-/* Scoped to our containers to avoid affecting host page SVGs */
-#chroma-notes-popover-root svg,
-#chroma-portal-root svg {
-  max-width: 100%;
-  max-height: 100%;
+#chroma-popover {
+  box-shadow: var(--shadow-md) !important;
+  border-radius: var(--radius) !important;
+  border: none !important;
+}
+
+/* Header span contrast */
+#chroma-notes-popover-root [data-draggable="true"] span {
+  color: hsl(var(--foreground)) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+}
+
+/* Pin icon rotation */
+.rotate-45 {
+  transform: rotate(45deg);
+}
+
+.rotate-0 {
+  transform: rotate(0deg);
+}
+
+/* 
+ * PORTAL & RADIX SCROLL LOCK OVERRIDE
+ */
+#chroma-portal-root {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 2147483647 !important;
+}
+
+#chroma-portal-root [data-radix-select-content] {
+  background-color: hsl(var(--background)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: var(--radius) !important;
+  pointer-events: auto !important;
+  box-shadow: none !important;
+}
+
+/* 
+ * RADIX SCROLL LOCK FIX 
+ */
+:where(html),
+:where(body) {
+  pointer-events: auto !important;
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
+
+/* Global button reset */
+#chroma-notes-popover-root button,
+#chroma-portal-root button {
+  background-image: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+[data-action-button] {
+  border-width: 1px !important;
+  border-style: solid !important;
+  padding: 8px 12px !important;
+  border-radius: var(--radius) !important;
 }

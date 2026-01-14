@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/components/common/Toaster';
 import { useErrorHandler } from '@/shared/hooks/useErrorHandler';
@@ -24,23 +24,41 @@ interface SelectionPopoverProps {
   position: { x: number; y: number };
   onClose: () => void;
   onFixed?: (fixed: boolean) => void;
+  isFixed?: boolean;
 }
 
 export function SelectionPopover({
   selectedText,
   sourceUrl,
   onClose,
-  onFixed
+  onFixed,
+  isFixed = false
 }: SelectionPopoverProps) {
   const { t, i18n } = useTranslation();
   const { success } = useToast();
   const { handleError } = useErrorHandler();
   const { createNote, updateNote, selectNote } = useNotesStore();
-    const { state, dispatch } = usePopoverState(selectedText);
+  const { state, dispatch } = usePopoverState(selectedText, isFixed);
   const popoverRef = useRef<HTMLDivElement>(null);
   const [noteDraft, setNoteDraft] = useState<Omit<Note, 'id' | 'createdAt' | 'updatedAt'> | undefined>(undefined);
   const [lastSavedNoteId, setLastSavedNoteId] = useState<string | null>(null);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+
+  // Setup UI interaction bridge for PDF viewer
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      let timeout: any;
+      (window as any).__CHROMA_SET_UI_INTERACTING = (value: boolean) => {
+        if (value) {
+          (window as any).__CHROMA_UI_INTERACTING = true;
+          if (timeout) clearTimeout(timeout);
+          timeout = setTimeout(() => {
+            (window as any).__CHROMA_UI_INTERACTING = false;
+          }, 500);
+        }
+      };
+    }
+  }, []);
 
   // Debug log for rendering
   console.log('[SelectionPopover] Rendered. Language:', i18n.language);
@@ -266,16 +284,15 @@ export function SelectionPopover({
       className={cn(
         'flex flex-col overflow-hidden',
         'bg-white dark:bg-zinc-900',
-        'rounded-xl',
-        'border border-zinc-200 dark:border-zinc-800',
-        'shadow-xl shadow-black/5',
+        'rounded-2xl shadow-xl', // Using Tailwind shadow as fallback/base
         'text-zinc-950 dark:text-zinc-50',
-        'transition-all duration-200 ease-out'
+        'transition-all duration-200 ease-out',
+        'border-0 shadow-none'
       )}
       style={{
-        width: '420px',
-        maxWidth: 'min(420px, calc(100vw - 32px))',
-        minWidth: '360px'
+        width: '380px',
+        maxWidth: 'min(380px, calc(100vw - 24px))',
+        minWidth: '320px'
       }}
     >
       <PopoverHeader
@@ -288,7 +305,7 @@ export function SelectionPopover({
         closeTooltip={t('common.close')}
       />
 
-      <div className="p-3 space-y-3">
+      <div className="p-4 pt-2 space-y-4">
         <TextInput
           value={state.text.editable}
           onChange={(value) => dispatch({ type: 'SET_EDITABLE_TEXT', payload: value })}
