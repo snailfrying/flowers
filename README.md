@@ -316,6 +316,8 @@ A: Go to Settings → Prompt Management to edit system prompts for each workflow
 
 <div align="center">
 
+[![Star History Chart](https://api.star-history.com/svg?repos=snailfrying/flowers&type=Date)](https://star-history.com/#snailfrying/flowers&Date)
+
 **Made with 💜 by the Flowers Team**
 
 [⬆ Back to Top](#-flowers)

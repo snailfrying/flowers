@@ -316,6 +316,8 @@ A: 进入 设置 → 提示词管理，编辑每个工作流的系统提示词�
 
 <div align="center">
 
+[![Star History Chart](https://api.star-history.com/svg?repos=snailfrying/flowers&type=Date)](https://star-history.com/#snailfrying/flowers&Date)
+
 **用 💜 制作 by Flowers 团队**
 
 [⬆ 回到顶部](#-flowers)
