@@ -36,6 +36,7 @@
 | 📝 **Note Generation** | Auto-generate structured notes from web content |
 | 💬 **RAG-Powered Chat** | Ask questions grounded in your personal knowledge base |
 | 📄 **PDF Translation** | Select and translate text directly within PDF documents |
+| 🖼️ **Image OCR** | Right-click images to extract text via LLM Vision, then translate/polish/notes |
 | 🎬 **Video Subtitle Translation** | Real-time AI translation of video subtitles (YouTube, etc.) |
 | 🌐 **Full Page Translation** | Bilingual comparison mode with technical content protection |
 | 🎨 **Customizable Prompts** | Edit and manage AI prompts for each workflow |
@@ -43,7 +44,8 @@
 ### 🚀 Highlights
 
 - **Popup on Selection** - Instant AI tools when you highlight text
-- **PDF Support** - Built-in PDF reader with full translation capabilities
+- **Image OCR** - Right-click any image to extract text with Vision models (GPT-4o, Gemini, Claude, etc.)
+- **PDF Support** - Built-in PDF reader with full translation capabilities and professional toolbar
 - **Multi-Provider Support** - Connect to OpenAI, Ollama, DeepSeek, DashScope, Anthropic, Google, and more
 - **Custom Prompts** - Full control over AI behavior for each workflow
 - **Side Panel Workspace** - Integrated chat, notes, and settings
@@ -81,7 +83,7 @@ Flowers supports a wide range of LLM providers out of the box:
 
 ### Custom Prompts
 
-Every AI workflow (Translation, Polish, Note Generation, Chat) uses customizable system prompts:
+Every AI workflow (Translation, Polish, Note Generation, Chat, Image OCR) uses customizable system prompts:
 
 - **Edit prompts** to match your domain or writing style
 - **Language-aware switching** ensures output matches your UI language
@@ -108,10 +110,22 @@ Select any text on a webpage and instantly translate it with context-aware AI tr
 
 Open any PDF in the built-in Flowers PDF Reader. Select text to translate, polish, or generate notes - just like on regular web pages.
 
-- Automatic PDF redirect to Flowers reader
+- Automatic PDF redirect to Flowers reader (including GitHub/GitLab blob URLs)
+- Professional toolbar: download, print, search, fullscreen, zoom, dark mode, page jump
 - Full popover functionality (translate, polish, notes, ask)
 - Pin, drag, and position the popover anywhere
-- Smooth scrolling with zoom controls
+- Lazy loading for long documents
+
+</details>
+
+<details>
+<summary><b>🖼️ Image OCR</b></summary>
+
+Right-click any image and choose **Extract Text (Flowers)** to extract text using a Vision Language Model.
+
+- Requires a VLM (e.g. GPT-4o, Claude 3, Gemini 3 Flash)
+- Extracted text flows into the same popover for translate, polish, notes, or ask
+- Customizable `ocr_system` and `ocr_user` prompts in Settings → Prompt Management
 
 </details>
 
@@ -153,9 +167,8 @@ Real-time video subtitle translation with intelligent batching and caching.
 │                     Browser Extension                    │
 ├──────────────────┬──────────────────┬───────────────────┤
 │   Selection UI   │   Workspace      │   API Bridge      │
-│   PDF Viewer     │                  │                   │
-│   Video Trans    │                  │                   │
-│   Full Page      │                  │                   │
+│   PDF Viewer     │   Image OCR      │                   │
+│   Video Trans    │   Full Page      │                   │
 └────────┬─────────┴────────┬─────────┴─────────┬─────────┘
          │                  │                   │
          └──────────────────┼───────────────────┘
@@ -214,6 +227,13 @@ cd ../frontend && npm run build
 1. Highlight any text on a webpage (or PDF)
 2. The Flowers popover appears automatically
 3. Choose: **Translate** | **Polish** | **Generate Note** | **Ask AI**
+
+### Image OCR
+
+1. Right-click any image on a webpage
+2. Select **Extract Text (Flowers)**
+3. OCR result appears in the popover—then translate, polish, or generate notes
+4. Requires a Vision model (e.g. GPT-4o, Claude 3, Gemini 3 Flash) in Settings → Model Config
 
 ### PDF Documents
 
@@ -296,6 +316,12 @@ A: Yes! Configure any OpenAI-compatible API endpoint. Works with Ollama, LM Stud
 <summary><b>Q: How do I customize prompts?</b></summary>
 
 A: Go to Settings → Prompt Management to edit system prompts for each workflow.
+</details>
+
+<details>
+<summary><b>Q: Image OCR says it failed—what model do I need?</b></summary>
+
+A: Image OCR requires a Vision Language Model (VLM). Configure one in Settings → Model Config (e.g. GPT-4o, Claude 3, Gemini 3 Flash). If the model doesn't support images, the API will return an error.
 </details>
 
 ---

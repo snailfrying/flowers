@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-02-26
+
+### Added
+
+- 📺 **Demo Video**: Added demo video showcasing the full Flowers workflow
+- 🖼️ **Image OCR**: Extract text from images via right-click context menu
+  - **Right-click "Extract Text (Flowers)"** on any image to run OCR via LLM Vision
+  - OCR result flows into SelectionPopover for translate, polish, notes, and ask
+  - **ocr_system / ocr_user prompts**: Bilingual defaults with user customization in Settings
+  - No hardcoded VLM whitelist: directly calls API, surfaces errors to user
+
+### Changed
+
+- 📄 **PDF Reader Enhancements**:
+  - **Toolbar**: Download, print, search, fullscreen, zoom, dark mode, page jump
+  - **GitHub/GitLab fix**: Auto-convert blob URLs to raw for HTML-embedded PDFs
+  - **Performance**: IntersectionObserver lazy loading for long documents
+  - **Stability**: Fixed "Canvas in use" rendering conflicts and scaling crashes
+  - **UX**: Loading and error states, URL normalization
+- Bootstrap loads prompt overrides before first request
+
+### Technical
+
+- Added `image-ocr` flow: context menu → fetch → Base64 → agent:ocr → popover
+- Prompt overrides loaded in Service Worker bootstrap
+- Star History chart in README footer
+
+---
+
 ## [0.3.0] - 2026-01-12
 
 ### Added
@@ -127,6 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+[0.4.0]: https://github.com/snailfrying/flowers/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/snailfrying/flowers/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/snailfrying/flowers/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/snailfrying/flowers/releases/tag/v0.1.0
