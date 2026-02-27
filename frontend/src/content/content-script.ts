@@ -218,6 +218,7 @@ let lastVirtualRef: { getBoundingClientRect: () => DOMRect } | null = null;
 let lastPointer: { x: number; y: number } | null = null;
 let selectionTimeout: number | null = null;
 let lastRightClickedImage: { el: HTMLImageElement; src: string } | null = null;
+let isOCRMode = false;
 let isUnfixing = false; // 标志：正在取消固定，防止被关闭
 const SELECTION_DEBOUNCE_DELAY = 150; // ms - wait for selection to stabilize
 const MIN_SELECTION_CHARS = 2; // Minimum characters required to trigger popover
@@ -670,7 +671,13 @@ async function showPopover(text: string, position: { x: number; y: number }, isO
   const sourceUrl = window.location.href;
   if (depsLoaded && popoverRoot) {
     try {
-      if (!isFixed) {
+      if (isOCRLoading || ocrError !== undefined || isOCRMode) {
+        isFixed = true;
+        popoverContainer!.style.position = 'fixed';
+        popoverContainer!.style.left = '50%';
+        popoverContainer!.style.top = '50%';
+        popoverContainer!.style.transform = 'translate(-50%, -50%)';
+      } else if (!isFixed) {
         await placePopoverWithFloating();
       } else {
         popoverContainer!.style.position = 'fixed';
@@ -777,6 +784,8 @@ async function showPopover(text: string, position: { x: number; y: number }, isO
 
 function hidePopover() {
   try {
+    isOCRMode = false;
+    isFixed = false;
     if (reactRendered && popoverRoot) {
       try {
         popoverRoot.render(null);
@@ -784,33 +793,29 @@ function hidePopover() {
         console.error('[Chroma] Error unmounting React root', _e);
       }
     }
-    if (!isFixed) {
-      // Clear React root reference
-      popoverRoot = null;
-      reactRendered = false;
+    popoverRoot = null;
+    reactRendered = false;
 
-      // Safely remove elements if still connected
-      if (popoverContainer && (popoverContainer as any).isConnected) {
-        try { (popoverContainer as any).remove(); } catch (_e) { }
-      }
-      popoverContainer = null;
-
-      if (uiBodyContainer && (uiBodyContainer as any).isConnected) {
-        try { (uiBodyContainer as any).remove(); } catch (_e) { }
-      }
-      uiBodyContainer = null;
-
-      if (bodyFallbackContainer && (bodyFallbackContainer as any).isConnected) {
-        try { (bodyFallbackContainer as any).remove(); } catch (_e) { }
-      }
-      bodyFallbackContainer = null;
-
-      if (shadowHost && (shadowHost as any).isConnected) {
-        try { (shadowHost as any).remove(); } catch (_e) { }
-      }
-      shadowHost = null;
-      shadowRootRef = null;
+    if (popoverContainer && (popoverContainer as any).isConnected) {
+      try { (popoverContainer as any).remove(); } catch (_e) { }
     }
+    popoverContainer = null;
+
+    if (uiBodyContainer && (uiBodyContainer as any).isConnected) {
+      try { (uiBodyContainer as any).remove(); } catch (_e) { }
+    }
+    uiBodyContainer = null;
+
+    if (bodyFallbackContainer && (bodyFallbackContainer as any).isConnected) {
+      try { (bodyFallbackContainer as any).remove(); } catch (_e) { }
+    }
+    bodyFallbackContainer = null;
+
+    if (shadowHost && (shadowHost as any).isConnected) {
+      try { (shadowHost as any).remove(); } catch (_e) { }
+    }
+    shadowHost = null;
+    shadowRootRef = null;
   } catch (_e) {
     console.error('[Chroma] Error in hidePopover', _e);
   }
@@ -944,7 +949,7 @@ document.addEventListener('click', (e) => {
     // Ignore the immediate click right after showing the popover
     return;
   }
-  if ((popoverContainer || uiBodyContainer) && !isFixed) {
+  if (popoverContainer || uiBodyContainer) {
     const path = (e.composedPath && e.composedPath()) || [];
     // 检查是否点击在弹窗内部（包括Shadow DOM和Portal容器）
     const clickedInside = path.some((el: any) => {
@@ -1014,13 +1019,6 @@ document.addEventListener('click', (e) => {
   }
 }, { passive: true }); // 使用默认的bubble阶段，不阻止React事件
 
-// 未固定：滚动即认为用户离开当前选区，直接关闭；固定则不受影响
-window.addEventListener('scroll', () => {
-  // 保护：拖动或取消固定时，不关闭
-  if (!isFixed && !isDraggingGlobal && !isUnfixing) {
-    hidePopover();
-  }
-}, true);
 
 // Global hotkey: Alt+Q to force open popover at screen center with current selection
 document.addEventListener('keydown', (e) => {
@@ -1076,32 +1074,20 @@ if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage)
       sendResponse({ success: true });
       return true;
     }
-    if (message.action === 'showOCRLoading') {
-      const pos = getImagePositionByUrl(message.imageUrl || '');
+    if (message.action === 'showOCRLoading' || message.action === 'showOCRResult' || message.action === 'showOCRError') {
       lastRightClickedImage = null;
-      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
-      lastPointer = pos;
-      showPopover('', pos, true, undefined).catch(() => {});
-      sendResponse({ success: true });
-      return true;
-    }
-    if (message.action === 'showOCRResult') {
-      const text = message.text || '';
-      const pos = getImagePositionByUrl(message.imageUrl || '');
-      lastRightClickedImage = null;
-      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
-      lastPointer = pos;
-      showPopover(text, pos, false, undefined).catch(() => {});
-      sendResponse({ success: true });
-      return true;
-    }
-    if (message.action === 'showOCRError') {
-      const err = message.error || 'OCR failed';
-      const pos = getImagePositionByUrl(message.imageUrl || '');
-      lastRightClickedImage = null;
-      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
-      lastPointer = pos;
-      showPopover('', pos, false, err).catch(() => {});
+      isOCRMode = true;
+      const center = { x: Math.round(window.innerWidth / 2), y: Math.round(window.innerHeight / 2) };
+      lastVirtualRef = null;
+      lastPointer = center;
+
+      if (message.action === 'showOCRLoading') {
+        showPopover('', center, true, undefined).catch(() => {});
+      } else if (message.action === 'showOCRResult') {
+        showPopover(message.text || '', center, false, undefined).catch(() => {});
+      } else {
+        showPopover('', center, false, message.error || 'OCR failed').catch(() => {});
+      }
       sendResponse({ success: true });
       return true;
     }

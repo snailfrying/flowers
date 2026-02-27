@@ -15,7 +15,7 @@ export function TextInput({ value, onChange, placeholder }: TextInputProps) {
                 onChange={(e) => onChange(e.target.value)}
                 className={cn(
                     'w-full text-sm min-h-[110px] max-h-[260px] resize-none overflow-y-auto',
-                    'bg-transparent border-0 p-0 focus-visible:ring-0',
+                    'bg-transparent border-0 p-0 focus-visible:ring-0 rounded-none',
                     'placeholder:text-zinc-400',
                     'leading-relaxed'
                 )}
