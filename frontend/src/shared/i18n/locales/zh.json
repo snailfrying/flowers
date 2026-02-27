@@ -118,6 +118,10 @@
     "addProvider": "添加服务商",
     "editProvider": "编辑服务商",
     "promptTips": "提示词提示",
+    "promptKeyLabel": {
+      "ocr_system": "OCR - 系统提示词",
+      "ocr_user": "OCR - 用户提示词"
+    },
     "export": "导出",
     "import": "导入",
     "promptSaved": "提示词已保存",
@@ -175,6 +179,8 @@
     "importMcpEmpty": "JSON 中未找到任何 mcpServers"
   },
   "popover": {
+    "ocrExtracting": "正在识别图片中的文字...",
+    "ocrError": "OCR 失败",
     "polish": "AI润色",
     "translate": "AI翻译",
     "note": "生成笔记",

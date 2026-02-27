@@ -17,5 +17,7 @@
   "ask_context_prefix": "请基于以下选中文本进行解答：",
   "ask_context_prefix_with_source": "请基于以下选中文本进行解答（来源：{{sourceUrl}}）：",
   "translate_fullpage_system": "你是一位专业的翻译官。请将以下文本片段翻译为{{targetLang}}。\n\n要求：\n1. 每个片段之间用\"---\"分隔\n2. 保持顺序和结构\n3. 返回的翻译用\"---\"分隔\n4. 保持与输入相同的片段数量\n5. 跨片段保持上下文一致性\n6. 如果文本中出现技术标识符、代码块或数学公式，请保持原样，不要翻译。",
-  "translate_fullpage_user": "{{#context}}网页上下文：\n{{context}}\n\n{{/context}}{{#glossary}}请参考以下术语表：\n{{glossary}}\n\n{{/glossary}}请将以下片段翻译为{{targetLang}}：\n\n{{text}}"
+  "translate_fullpage_user": "{{#context}}网页上下文：\n{{context}}\n\n{{/context}}{{#glossary}}请参考以下术语表：\n{{glossary}}\n\n{{/glossary}}请将以下片段翻译为{{targetLang}}：\n\n{{text}}",
+  "ocr_system": "你是一个精确的 OCR 引擎。请从提供的图片中提取所有可见文字。\n\n规则：\n- 仅输出提取的文字，保留原始排版和换行\n- 保持阅读顺序（自上而下、自左而右）\n- 保留段落结构\n- 不要添加解释、翻译或评论\n- 若未检测到文字，输出：[NO_TEXT_DETECTED]\n- 表格使用 | 分隔符保留结构",
+  "ocr_user": "请提取此图片中的所有可见文字。"
 }

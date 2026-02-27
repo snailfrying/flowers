@@ -25,6 +25,10 @@ interface SelectionPopoverProps {
   onClose: () => void;
   onFixed?: (fixed: boolean) => void;
   isFixed?: boolean;
+  /** When true, show OCR loading state (extracting text from image) */
+  isOCRLoading?: boolean;
+  /** When set, show OCR error state with this message */
+  ocrError?: string;
 }
 
 export function SelectionPopover({
@@ -32,7 +36,9 @@ export function SelectionPopover({
   sourceUrl,
   onClose,
   onFixed,
-  isFixed = false
+  isFixed = false,
+  isOCRLoading = false,
+  ocrError
 }: SelectionPopoverProps) {
   const { t, i18n } = useTranslation();
   const { success } = useToast();
@@ -274,6 +280,75 @@ export function SelectionPopover({
   const handlePopoverClick = () => {
     setUIInteracting(true);
   };
+
+  if (isOCRLoading) {
+    return (
+      <div
+        id="chroma-popover"
+        data-fixed={state.isFixed ? 'true' : 'false'}
+        ref={popoverRef}
+        onClick={handlePopoverClick}
+        className={cn(
+          'flex flex-col overflow-hidden',
+          'bg-white dark:bg-zinc-900',
+          'rounded-2xl shadow-xl',
+          'text-zinc-950 dark:text-zinc-50',
+          'border-0 shadow-none'
+        )}
+        style={{ width: '380px', maxWidth: 'min(380px, calc(100vw - 24px))', minWidth: '320px' }}
+      >
+        <PopoverHeader
+          isFixed={state.isFixed}
+          title={t('common.brandName')}
+          onToggleFixed={handleToggleFixed}
+          onClose={onClose}
+          pinTooltip={t('popover.pin')}
+          unpinTooltip={t('popover.unpin')}
+          closeTooltip={t('common.close')}
+        />
+        <div className="p-6 flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400">
+          <Loading size="sm" />
+          <span className="text-sm mt-3">{t('popover.ocrExtracting') || 'Extracting text from image...'}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (ocrError) {
+    return (
+      <div
+        id="chroma-popover"
+        data-fixed={state.isFixed ? 'true' : 'false'}
+        ref={popoverRef}
+        onClick={handlePopoverClick}
+        className={cn(
+          'flex flex-col overflow-hidden',
+          'bg-white dark:bg-zinc-900',
+          'rounded-2xl shadow-xl',
+          'text-zinc-950 dark:text-zinc-50',
+          'border-0 shadow-none'
+        )}
+        style={{ width: '380px', maxWidth: 'min(380px, calc(100vw - 24px))', minWidth: '320px' }}
+      >
+        <PopoverHeader
+          isFixed={state.isFixed}
+          title={t('common.brandName')}
+          onToggleFixed={handleToggleFixed}
+          onClose={onClose}
+          pinTooltip={t('popover.pin')}
+          unpinTooltip={t('popover.unpin')}
+          closeTooltip={t('common.close')}
+        />
+        <div className="p-4 flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-red-500 dark:text-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
+            <span className="text-sm font-medium">{t('popover.ocrError') || 'OCR Failed'}</span>
+          </div>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 break-words">{ocrError}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -110,7 +110,7 @@ export function PromptManagement() {
       {Object.entries(prompts).map(([key, prompt]) => (
         <Collapsible key={key}>
           <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted rounded-lg hover:bg-accent">
-            <span className="font-medium">{key}</span>
+            <span className="font-medium">{t(`settings.promptKeyLabel.${key}`, { defaultValue: key })}</span>
             <ChevronDown className="h-4 w-4" />
           </CollapsibleTrigger>
           <CollapsibleContent className="p-4 space-y-4">

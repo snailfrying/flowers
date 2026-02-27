@@ -190,6 +190,18 @@ export class ServiceWorkerMessageHandler {
           break;
         }
 
+        case 'agent:ocr': {
+          const { imageBase64, mimeType } = params as { imageBase64: string; mimeType: string };
+          console.info('[Backend] Calling agent.ocr...', {
+            imageSizeKB: imageBase64 ? Math.round(imageBase64.length * 0.75 / 1024) : 0,
+            mimeType
+          });
+          const result = await this.agent!.ocr({ imageBase64, mimeType });
+          console.info('[Backend] agent.ocr result:', { textLength: result?.text?.length || 0 });
+          data = result;
+          break;
+        }
+
         // Notes actions
         case 'notes:create':
           data = await this.syncService!.createNote(params as Omit<Note, 'id' | 'createdAt' | 'updatedAt'>);

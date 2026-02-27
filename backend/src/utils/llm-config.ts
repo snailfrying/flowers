@@ -121,11 +121,8 @@ export function validateLLMConfig(
 }
 
 /**
- * Get model type from model name or config
- * Useful for determining if a model supports vision
+ * OCR does not pre-check model VLM support. It directly calls the API with image.
+ * If the model does not support vision, the API will return an error which is
+ * passed through to the user. This avoids maintaining a hardcoded VLM list as
+ * models are updated frequently.
  */
-export function getModelType(modelName: string): 'llm' | 'vlm' {
-    const visionModels = ['gpt-4-vision', 'gpt-4o', 'claude-3', 'gemini-pro-vision'];
-    const isVision = visionModels.some(vm => modelName.toLowerCase().includes(vm));
-    return isVision ? 'vlm' : 'llm';
-}

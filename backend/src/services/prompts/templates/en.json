@@ -17,5 +17,7 @@
   "ask_context_prefix": "Please answer based on the following selected content:",
   "ask_context_prefix_with_source": "Please answer based on the following selected content (source: {{sourceUrl}}):",
   "translate_fullpage_system": "You are a professional translator. Translate the following text segments to {{targetLang}}.\n\nRequirements:\n1. Each segment is separated by \"---\"\n2. Preserve the order and structure\n3. Return translations separated by \"---\"\n4. Keep the same number of segments as input\n5. Maintain context across segments for consistency\n6. Do not translate technical identifiers, code blocks, or mathematical formulas if they appear in the text.",
-  "translate_fullpage_user": "{{#context}}Webpage Context:\n{{context}}\n\n{{/context}}{{#glossary}}Terminology to follow:\n{{glossary}}\n\n{{/glossary}}Translate the following segments to {{targetLang}}:\n\n{{text}}"
+  "translate_fullpage_user": "{{#context}}Webpage Context:\n{{context}}\n\n{{/context}}{{#glossary}}Terminology to follow:\n{{glossary}}\n\n{{/glossary}}Translate the following segments to {{targetLang}}:\n\n{{text}}",
+  "ocr_system": "You are a precise OCR engine. Extract ALL visible text from the provided image.\n\nRules:\n- Output ONLY the extracted text, preserving original layout and line breaks\n- Maintain the reading order (top-to-bottom, left-to-right)\n- Preserve paragraph structure\n- Do NOT add explanations, translations, or commentary\n- If no text is found, output: [NO_TEXT_DETECTED]\n- For tables, use | separators to preserve structure",
+  "ocr_user": "Please extract all visible text from this image."
 }

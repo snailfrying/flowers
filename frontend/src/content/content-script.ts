@@ -215,8 +215,9 @@ let uiInteracting = false;
 let lastShowAt = 0;
 let debugBeacon: HTMLDivElement | null = null;
 let lastVirtualRef: { getBoundingClientRect: () => DOMRect } | null = null;
-let lastPointer: { x: number; y: number } | null = null; // last mouseup point
-let selectionTimeout: number | null = null; // Debounce timer for text selection
+let lastPointer: { x: number; y: number } | null = null;
+let selectionTimeout: number | null = null;
+let lastRightClickedImage: { el: HTMLImageElement; src: string } | null = null;
 let isUnfixing = false; // 标志：正在取消固定，防止被关闭
 const SELECTION_DEBOUNCE_DELAY = 150; // ms - wait for selection to stabilize
 const MIN_SELECTION_CHARS = 2; // Minimum characters required to trigger popover
@@ -634,7 +635,7 @@ function ensureBodyFallbackContainer(): HTMLDivElement {
   return bodyFallbackContainer;
 }
 
-async function showPopover(text: string, position: { x: number; y: number }) {
+async function showPopover(text: string, position: { x: number; y: number }, isOCRLoading = false, ocrError?: string) {
   lastShowAt = Date.now();
   let depsLoaded = false;
   try {
@@ -694,6 +695,8 @@ async function showPopover(text: string, position: { x: number; y: number }) {
                 selectedText: text,
                 sourceUrl: sourceUrl,
                 position: position,
+                isOCRLoading,
+                ocrError,
                 onClose: hidePopover,
                 onFixed: (fixed: boolean) => {
                   isFixed = fixed;
@@ -1040,14 +1043,69 @@ document.addEventListener('keydown', (e) => {
   } catch (_e) { }
 }, true);
 
-// Listen for messages from Service Worker
+function getImagePositionByUrl(imageUrl: string): { x: number; y: number } {
+  if (lastRightClickedImage && (lastRightClickedImage.src === imageUrl || imageUrl.includes(lastRightClickedImage.src) || lastRightClickedImage.src.includes(imageUrl))) {
+    const rect = lastRightClickedImage.el.getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.bottom + 8 };
+  }
+  for (const img of document.images) {
+    const src = img.currentSrc || img.src;
+    if (!src) continue;
+    if (src === imageUrl || imageUrl.startsWith(src) || src.startsWith(imageUrl) || imageUrl.includes(src)) {
+      const rect = img.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.bottom + 8 };
+    }
+  }
+  return { x: Math.round(window.innerWidth / 2), y: Math.round(window.innerHeight / 2) };
+}
+
+document.addEventListener('contextmenu', (e: MouseEvent) => {
+  const target = e.target as HTMLElement;
+  const img = target?.closest?.('img');
+  if (img) {
+    lastRightClickedImage = { el: img, src: img.currentSrc || img.src || '' };
+  } else {
+    lastRightClickedImage = null;
+  }
+}, { capture: true, passive: true });
+
 if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((message: any, _sender: any, sendResponse: (response: any) => void) => {
     if (message.action === 'hidePopover') {
       hidePopover();
       sendResponse({ success: true });
+      return true;
     }
-    return true; // Keep channel open for async response
+    if (message.action === 'showOCRLoading') {
+      const pos = getImagePositionByUrl(message.imageUrl || '');
+      lastRightClickedImage = null;
+      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
+      lastPointer = pos;
+      showPopover('', pos, true, undefined).catch(() => {});
+      sendResponse({ success: true });
+      return true;
+    }
+    if (message.action === 'showOCRResult') {
+      const text = message.text || '';
+      const pos = getImagePositionByUrl(message.imageUrl || '');
+      lastRightClickedImage = null;
+      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
+      lastPointer = pos;
+      showPopover(text, pos, false, undefined).catch(() => {});
+      sendResponse({ success: true });
+      return true;
+    }
+    if (message.action === 'showOCRError') {
+      const err = message.error || 'OCR failed';
+      const pos = getImagePositionByUrl(message.imageUrl || '');
+      lastRightClickedImage = null;
+      lastVirtualRef = { getBoundingClientRect: () => new DOMRect(pos.x, pos.y, 0, 0) };
+      lastPointer = pos;
+      showPopover('', pos, false, err).catch(() => {});
+      sendResponse({ success: true });
+      return true;
+    }
+    return true;
   });
 }
 // Debug beacon removed completely

@@ -6,6 +6,7 @@ import { chatNode, chatNodeStream } from './nodes/chat.js';
 import { queryTransformNode } from './nodes/queryTransform.js';
 import { synthesisNode } from './nodes/synthesis.js';
 import { generateNoteNode } from './nodes/generateNote.js';
+import { ocrNode, type OCRParams } from './nodes/ocr.js';
 import { RAGService } from '../services/rag/index.js';
 import type {
   Language,
@@ -586,6 +587,11 @@ export class CoreAgent {
       : (await import('../services/prompts/index.js')).getPrompt('ask_context_prefix');
     const userInput = `${prefix}\n\n${text}`;
     return this.chat({ userInput }, false);
+  }
+
+  async ocr(params: OCRParams): Promise<{ text: string; confidence: number }> {
+    const client = this.getClient(undefined, params.llmConfig);
+    return ocrNode(client, params);
   }
 
   async *chatStream(params: ChatParams, mcpEnabled = false): AsyncIterable<StreamChunk & { trace?: MCPTrace }> {

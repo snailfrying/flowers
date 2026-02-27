@@ -124,6 +124,10 @@
     "addProvider": "Add Provider",
     "editProvider": "Edit Provider",
     "promptTips": "Prompt Tips",
+    "promptKeyLabel": {
+      "ocr_system": "OCR - System Prompt",
+      "ocr_user": "OCR - User Prompt"
+    },
     "export": "Export",
     "import": "Import",
     "promptSaved": "Prompt saved",
@@ -181,6 +185,8 @@
     "importMcpEmpty": "No MCP servers found in JSON."
   },
   "popover": {
+    "ocrExtracting": "Extracting text from image...",
+    "ocrError": "OCR Failed",
     "polish": "Polish",
     "translate": "Translate",
     "note": "Generate Note",

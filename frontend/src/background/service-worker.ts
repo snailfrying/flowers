@@ -11,9 +11,12 @@ declare const chrome: {
     sendMessage: (message: any) => Promise<any>;
     lastError?: { message?: string };
     id: string;
+    getURL: (path: string) => string;
   };
   storage?: { local: { set: (items: Record<string, any>) => Promise<void> } };
   sidePanel?: { open: (opts?: { tabId?: number; windowId?: number }) => Promise<void> };
+  contextMenus?: { create: (options: any, cb?: () => void) => void; onClicked: { addListener: (cb: (info: any, tab?: any) => void) => void } };
+  tabs?: { sendMessage: (tabId: number, message: any) => Promise<any>; update: (tabId: number, opts: any) => Promise<any> };
 };
 // 禁用 WASM，防止任何库在 SW 中尝试 instantiate（提供最小桩对象，避免 instanceof/构造器访问报错）
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,6 +66,12 @@ async function bootstrap() {
       console.log('[Service Worker] Loading settings from storage...');
       await mod.loadSettingsFromStorage();
       console.log('[Service Worker] Settings loaded from Chrome Storage');
+    }
+
+    if (mod.loadPromptOverridesFromStorage) {
+      console.log('[Service Worker] Loading prompt overrides from storage...');
+      await mod.loadPromptOverridesFromStorage();
+      console.log('[Service Worker] Prompt overrides loaded');
     }
 
     if (mod.initializeServiceWorker) {
@@ -160,6 +169,18 @@ chrome.runtime.onInstalled.addListener(async (details: any) => {
       }
     });
 
+    // Create Context Menu for image OCR (Extract Text)
+    // @ts-ignore
+    chrome.contextMenus.create({
+      id: 'flowers-image-ocr',
+      title: 'Extract Text (Flowers)',
+      contexts: ['image']
+    }, () => {
+      if (chrome.runtime.lastError) {
+        // Ignore error if item already exists
+      }
+    });
+
     // Ensure rules are set up immediately on install
     await ensurePDFRedirectRule();
   }
@@ -167,19 +188,99 @@ chrome.runtime.onInstalled.addListener(async (details: any) => {
 
 // Handle Context Menu Clicks
 // @ts-ignore
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'open-in-flowers-pdf') {
-    // Prefer linkUrl if clicked on a link, otherwise pageUrl
     const targetUrl = info.linkUrl || info.pageUrl;
-    if (targetUrl) {
-      // @ts-ignore
+    if (targetUrl && tab?.id) {
       const viewerUrl = chrome.runtime.getURL(`src/pages/pdf-viewer/index.html?file=${encodeURIComponent(targetUrl)}`);
-      // Update current tab
-      // @ts-ignore
-      chrome.tabs.update(tab.id, { url: viewerUrl });
+      (chrome as any).tabs?.update(tab.id, { url: viewerUrl });
     }
+    return;
+  }
+
+  if (info.menuItemId === 'flowers-image-ocr' && info.srcUrl && tab?.id && chrome.tabs) {
+    handleImageOCR(info.srcUrl, tab.id);
   }
 });
+
+/** Fetch image as base64. Caller must clear refs after use to avoid memory bloat. */
+async function fetchImageAsBase64(url: string): Promise<{ base64: string; mimeType: string }> {
+  if (url.startsWith('data:')) {
+    const match = url.match(/^data:([^;]+);base64,(.+)$/);
+    if (match) return { base64: match[2], mimeType: match[1] || 'image/png' };
+  }
+  if (url.startsWith('blob:')) {
+    throw new Error('Blob URL images must be processed in the page. Please try a different image.');
+  }
+  const res = await fetch(url, { headers: { Accept: 'image/*' } });
+  if (!res.ok) throw new Error(`Failed to fetch image: ${res.status}`);
+  const blob = await res.blob();
+  const sizeKB = blob.size / 1024;
+  if (sizeKB > 10240) throw new Error(`Image too large (${Math.round(sizeKB)}KB). Max 10MB.`);
+  const mimeType = blob.type || 'image/png';
+  const buf = await blob.arrayBuffer();
+  const arr = new Uint8Array(buf);
+  let binary = '';
+  const chunkSize = 8192;
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    const chunk = arr.subarray(i, Math.min(i + chunkSize, arr.length));
+    binary += String.fromCharCode.apply(null, Array.from(chunk));
+  }
+  const base64 = btoa(binary);
+  return { base64, mimeType };
+}
+
+async function handleImageOCR(srcUrl: string, tabId: number) {
+  const tabs = (chrome as any).tabs;
+  if (!tabs) return;
+  try {
+    tabs.sendMessage(tabId, { action: 'showOCRLoading', imageUrl: srcUrl }).catch(() => {});
+  } catch (_e) { /* content script may not be ready */ }
+
+  let imageBase64: string | null = null;
+  let mimeType = 'image/png';
+
+  try {
+    const fetched = await fetchImageAsBase64(srcUrl);
+    imageBase64 = fetched.base64;
+    mimeType = fetched.mimeType;
+
+    const backend = (globalThis as any).__CHROMA_BACKEND__;
+    if (!backend?.ServiceWorkerMessageHandler) {
+      tabs.sendMessage(tabId, {
+        action: 'showOCRError',
+        error: 'Extension not ready. Please refresh the page and try again.'
+      });
+      return;
+    }
+
+    const handler = new backend.ServiceWorkerMessageHandler();
+    const response = await handler.handleMessage({
+      action: 'agent:ocr',
+      params: { imageBase64, mimeType },
+      requestId: `ocr_${Date.now()}_${Math.random().toString(36).slice(2)}`
+    });
+
+    imageBase64 = null;
+
+    if (response.success && response.data) {
+      tabs.sendMessage(tabId, {
+        action: 'showOCRResult',
+        text: response.data.text,
+        imageUrl: srcUrl,
+        confidence: response.data.confidence ?? 0.9
+      });
+    } else {
+      const errMsg = response.error?.message || response.error || 'OCR failed';
+      tabs.sendMessage(tabId, { action: 'showOCRError', error: errMsg, imageUrl: srcUrl });
+    }
+  } catch (e: any) {
+    const errMsg = e?.message || String(e);
+    tabs.sendMessage(tabId, { action: 'showOCRError', error: errMsg, imageUrl: srcUrl }).catch(() => {});
+  } finally {
+    imageBase64 = null;
+  }
+}
 
 // Handle action click (open side panel)
 // This is the modern MV3 way to toggle side panel on icon click
