@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-02-28
+
+### Fixed
+
+- 🖥️ **HiDPI PDF Rendering**: Eliminated blurriness on Retina/4K displays by implementing high-resolution canvas scaling based on `devicePixelRatio`
+
+### Changed
+
+- 🖼️ **Modern Flat PDF Viewer**: Overhauled the PDF reader interface with a clean, Zinc-based color palette and flat UI aesthetics
+- 🎨 **Glassmorphism UI**: SelectionPopover now features a premium frosted glass effect with backdrop-blur and refined shadows
+- 🌈 **Enhanced Result Display**: Added subtle color gradients to translation/polish result boxes for better visual hierarchy
+
+### Added
+
+- 📏 **Smart Boundary Detection**: Popover intelligently adjusts its position to stay within screen edges, preventing overflow
+
+---
+
 ## [0.4.0] - 2026-02-26
 
 ### Added
