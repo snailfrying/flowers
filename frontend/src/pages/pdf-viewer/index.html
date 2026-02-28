@@ -6,26 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flowers PDF Reader</title>
     <style>
-        /* PDF Viewer specific styles - scoped with pdf- prefix to avoid Tailwind conflicts */
+        /* PDF Viewer specific styles - modern, minimal flat design */
         .pdf-viewer-root {
-            --pdf-bg-primary: #f5f5f5;
-            --pdf-bg-secondary: #525659;
+            --pdf-bg-primary: #ffffff;
+            --pdf-bg-secondary: #f4f4f5;
+            /* clean light gray for pdf container */
             --pdf-bg-toolbar: #ffffff;
-            --pdf-text-primary: #333333;
-            --pdf-text-secondary: #666666;
-            --pdf-border-color: #e0e0e0;
-            --pdf-accent-color: #4285f4;
-            --pdf-hover-bg: #f0f0f0;
+            --pdf-text-primary: #18181b;
+            /* zinc-900 */
+            --pdf-text-secondary: #71717a;
+            /* zinc-500 */
+            --pdf-border-color: #e4e4e7;
+            /* zinc-200 */
+            --pdf-accent-color: #3b82f6;
+            /* modern blue */
+            --pdf-hover-bg: #f4f4f5;
         }
 
         .pdf-viewer-root.dark-mode {
-            --pdf-bg-primary: #1a1a1a;
-            --pdf-bg-secondary: #2d2d2d;
-            --pdf-bg-toolbar: #333333;
-            --pdf-text-primary: #e0e0e0;
-            --pdf-text-secondary: #999999;
-            --pdf-border-color: #444444;
-            --pdf-hover-bg: #404040;
+            --pdf-bg-primary: #09090b;
+            /* zinc-950 */
+            --pdf-bg-secondary: #18181b;
+            /* zinc-900 */
+            --pdf-bg-toolbar: #09090b;
+            --pdf-text-primary: #f4f4f5;
+            /* zinc-100 */
+            --pdf-text-secondary: #a1a1aa;
+            /* zinc-400 */
+            --pdf-border-color: #27272a;
+            /* zinc-800 */
+            --pdf-accent-color: #3b82f6;
+            --pdf-hover-bg: #27272a;
         }
 
         body {
@@ -169,9 +180,11 @@
 
         .page-wrapper {
             position: relative;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--pdf-border-color);
             background: white;
+            transition: transform 0.2s ease;
         }
 
         .textLayer {
@@ -285,9 +298,9 @@
             right: 16px;
             background: var(--pdf-bg-toolbar);
             border: 1px solid var(--pdf-border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
             z-index: 100;
             display: flex;
             gap: 8px;
@@ -311,7 +324,9 @@
 
         /* Page placeholder */
         .page-placeholder {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--pdf-border-color);
+            border-radius: 2px;
         }
     </style>
 </head>

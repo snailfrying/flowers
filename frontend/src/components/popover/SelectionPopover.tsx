@@ -290,7 +290,7 @@ export function SelectionPopover({
         onClick={handlePopoverClick}
         className={cn(
           'flex flex-col overflow-hidden',
-          'bg-white dark:bg-zinc-900',
+          'bg-white/85 backdrop-blur-xl dark:bg-zinc-900/85 dark:backdrop-blur-xl border border-white/20 dark:border-white/10',
           'rounded-2xl shadow-xl',
           'text-zinc-950 dark:text-zinc-50',
           'border-0 shadow-none'
@@ -323,7 +323,7 @@ export function SelectionPopover({
         onClick={handlePopoverClick}
         className={cn(
           'flex flex-col overflow-hidden',
-          'bg-white dark:bg-zinc-900',
+          'bg-white/85 backdrop-blur-xl dark:bg-zinc-900/85 dark:backdrop-blur-xl border border-white/20 dark:border-white/10',
           'rounded-2xl shadow-xl',
           'text-zinc-950 dark:text-zinc-50',
           'border-0 shadow-none'
@@ -358,11 +358,11 @@ export function SelectionPopover({
       onClick={handlePopoverClick}
       className={cn(
         'flex flex-col overflow-hidden',
-        'bg-white dark:bg-zinc-900',
+        'bg-white/85 backdrop-blur-xl dark:bg-zinc-900/85 dark:backdrop-blur-xl border border-white/20 dark:border-white/10',
         'rounded-2xl shadow-xl', // Using Tailwind shadow as fallback/base
         'text-zinc-950 dark:text-zinc-50',
-        'transition-all duration-200 ease-out',
-        'border-0 shadow-none'
+        'transition-all duration-200 ease-out z-50',
+        'shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.4)]'
       )}
       style={{
         width: '380px',

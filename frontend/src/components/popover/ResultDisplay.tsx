@@ -67,7 +67,7 @@ export function ResultDisplay({
             </div>
 
             <div className={cn(
-                "w-full rounded-lg bg-zinc-50/80 dark:bg-zinc-800/40 p-3",
+                "w-full rounded-lg bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100/50 dark:border-indigo-800/30 p-3",
                 "text-sm leading-relaxed",
                 "max-h-[320px] overflow-y-auto"
             )}>

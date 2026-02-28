@@ -180,9 +180,25 @@ const PDFViewer: React.FC = () => {
                     const range = selection.getRangeAt(0);
                     const rect = range.getBoundingClientRect();
                     lastShowTime = Date.now();
+
+                    const popoverWidth = 380;
+                    const popoverHeight = 350; // estimated max height
+
+                    let x = rect.left;
+                    let y = rect.bottom + 10;
+
+                    if (x + popoverWidth > window.innerWidth) {
+                        x = window.innerWidth - popoverWidth - 20;
+                    }
+                    if (x < 20) x = 20;
+
+                    if (y + popoverHeight > window.innerHeight) {
+                        y = Math.max(20, rect.top - popoverHeight - 10);
+                    }
+
                     setPopoverState({
                         text: text,
-                        position: { x: rect.left, y: rect.bottom + 10 },
+                        position: { x, y },
                         visible: true,
                         isFixed: false
                     });
@@ -653,7 +669,8 @@ const PagePlaceholder = memo<{
                 width: dimensions.width,
                 height: dimensions.height,
                 marginBottom: 20,
-                background: isVisible ? 'transparent' : '#e0e0e0',
+                background: isVisible ? 'transparent' : 'var(--pdf-hover-bg)',
+                border: '1px solid var(--pdf-border-color)',
             }}
         >
             {isVisible ? (
@@ -714,7 +731,10 @@ const PDFPage = memo<{ pdf: any; pageNumber: number; scale: number }>(({ pdf, pa
                     return;
                 }
 
-                const viewport = page.getViewport({ scale });
+                const pixelRatio = window.devicePixelRatio || 1;
+                const viewport = page.getViewport({ scale: scale * pixelRatio });
+                const cssViewport = page.getViewport({ scale });
+
                 const canvas = canvasRef.current;
                 const context = canvas?.getContext('2d');
 
@@ -722,8 +742,12 @@ const PDFPage = memo<{ pdf: any; pageNumber: number; scale: number }>(({ pdf, pa
                     // Set dimensions
                     canvas.height = viewport.height;
                     canvas.width = viewport.width;
-                    wrapperRef.current.style.width = `${viewport.width}px`;
-                    wrapperRef.current.style.height = `${viewport.height}px`;
+
+                    canvas.style.width = `${cssViewport.width}px`;
+                    canvas.style.height = `${cssViewport.height}px`;
+
+                    wrapperRef.current.style.width = `${cssViewport.width}px`;
+                    wrapperRef.current.style.height = `${cssViewport.height}px`;
 
                     // Render canvas
                     const renderContext = {
@@ -762,7 +786,7 @@ const PDFPage = memo<{ pdf: any; pageNumber: number; scale: number }>(({ pdf, pa
                         pdfjsLib.renderTextLayer({
                             textContentSource: textContent,
                             container: textLayerRef.current,
-                            viewport: viewport,
+                            viewport: cssViewport,
                             textDivs: []
                         });
                     }
